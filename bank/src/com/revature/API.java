@@ -4,7 +4,7 @@ import java.util.*;
 
 public class API {
     // Attributes
-    public Scanner s;
+    private Scanner s;
 
     // Constructors
 
@@ -15,17 +15,39 @@ public class API {
     // Connor
     public void launch() {
         System.out.println("Welcome to Bank of CLI!");
+        System.out.println("To login, type 'l'. To register, type 'r'. To quit, type 'q'.");
+
+        // Query loop to ask the user which command they'd like
+        // to execute.
         while (true) {
-            System.out.println("To login, click l. To register, click r");
-            if (l) {
-                // Login
-            } else if (r) {
-                // Register
-            } else if (q) {
-                // Quit loop
+            String command = s.nextLine();
+
+            // Login = 'l'
+            if (command.equals("l")) {
+                // Prompt the user for their account ID and PIN
+                System.out.print("Welcome to the login screen. Please provide your Account ID: ");
+                String accountID = s.nextLine();
+                System.out.print("\nPlease provide your PIN: ");
+                String pin = s.nextLine();
+
+                // Call login to determine if the login was successful
+                login(accountID, pin);
+
+                // Leads to the application quitting
                 break;
+
+            // Register = 'r'
+            } else if (command.equals("r")) {
+                register();
+                break;
+
+            // Quit = 'q'
+            } else if (command.equals("q")) {
+                break;
+
+            // Anything else prompts the user to choose a valid option.
             } else {
-                // Print nice error message and restart
+                System.out.println("Command unknown. Please choose one of the specified options.");
             }
         }
     }
@@ -41,6 +63,7 @@ public class API {
         try {
             if(Business.verifyCredentials(AcountID, PIN)) {
                 System.out.println("Login Successful!");
+                // Would call homeAccountPage here
             }
             else {
                 System.out.println("Username or password is incorrect, please try again");
@@ -75,8 +98,16 @@ public class API {
 
     // Main
     public void run() {
+        // Might want to use the Singleton pattern in the future,
+        // but considering there aren't multiple threads involved,
+        // it may not be needed.
         s = new Scanner(System.in);
+
+        // Run the launch function
         this.launch();
+
+        // Close the scanner once the application closes;
+        // Might need to change this in the future.
         s.close();
     }
 }
