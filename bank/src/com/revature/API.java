@@ -59,11 +59,11 @@ public class API {
 
     // Yousef
     // Class is private because method should only be accessed within class (API) and not outside
-    private void login(String AcountID, String PIN) {
+    private void login(String accountID, String pin) {
         try {
-            if(Business.verifyCredentials(AcountID, PIN)) {
+            if(Business.verifyCredentials(accountID, pin)) {
                 System.out.println("Login Successful!");
-                // Would call homeAccountPage here
+                homeAccountPage(accountID);
             }
             else {
                 System.out.println("Username or password is incorrect, please try again");
@@ -76,8 +76,58 @@ public class API {
     // This will be the query loop where it will ask you what you want to do:
     // view balance, deposit, withdraw, transfer, or view activity
     // Damon
-    public void homeAccountPage() {
+    private void homeAccountPage(String accountID) {
         // Another query loop with those 5 tasks
+        // would we want these messages to print each time you get to this page?
+        // in that case, if you return from any of the actions, maybe we should move these into the while loop?
+        // same sort of reasoning with the text in launch()
+        System.out.println("Welcome " + accountID + " to your home page! What would you like to do?");
+        System.out.println("Please use the following options to perform your actions: \n" +
+                "Type 'b' to view your balance.\n" +
+                "Type 'd' to deposit an amount into your account.\n" +
+                "Type 'w' to withdraw an amount from your account.\n" +
+                "Type 't' to transfer an amount from one account to another.\n" +
+                "Type 'v' to view previous account activity.\n" +
+                "Type 'q' to quit to the main menu");
+
+        /*
+            design choice between switch cases and if statements:
+            - the switch case would require a boolean variable to determine breaking out of the while loop
+         */
+        boolean isQuit = false;
+        while (!isQuit) {
+            String command = s.nextLine();
+
+            switch (command) {
+                case "b":
+                    viewBalance(accountID);
+                    break;
+                case "d":
+                    // I will leave this implementation like this for now
+                    // just unsure whether to ask for the value here or write the logic in the actual method
+                    deposit();
+                    break;
+                case "w":
+                    // same reasoning here
+                    withdraw();
+                    break;
+                case "t":
+                    // same thing here
+                    transfer();
+                    break;
+                case "v":
+                    // same thing here
+                    viewActivity();
+                    break;
+                case "q":
+                    // same thing here
+                    isQuit = true;
+                    break;
+                default:
+                    System.out.println("Not a valid option. Please try again with a valid option.");
+                    break;
+            }
+        }
     }
 
     // First come first serve for these 5
