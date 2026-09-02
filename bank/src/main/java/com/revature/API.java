@@ -7,13 +7,12 @@ public class API {
     public Scanner s;
 
     // Constructors
-    public API() {
-        s = new Scanner(System.in);
-    }
 
     //////////////
     // Methods ///
     //////////////
+    
+    // Connor
     public void launch() {
         System.out.println("Welcome to Bank of CLI!");
         while (true) {
@@ -23,7 +22,8 @@ public class API {
             } else if (r) {
                 // Register
             } else if (q) {
-                // Quit app
+                // Quit loop
+                break;
             } else {
                 // Print nice error message and restart
             }
@@ -31,21 +31,25 @@ public class API {
     }
 
     // After you register, it should send you back to the launch to login
+    // Ydur
     public void register() {
 
     }
 
-    //
+    // Yousef
     public void login() {
 
     }
 
     // This will be the query loop where it will ask you what you want to do:
     // view balance, deposit, withdraw, transfer, or view activity
+    // Damon
     public void homeAccountPage() {
-
+        // Another query loop with those 5 tasks
     }
 
+
+    // First come first serve for these 5
     public void viewBalance() {
 
     }
@@ -68,6 +72,7 @@ public class API {
 
     // Main
     public void run() {
+        s = new Scanner(System.in);
         this.launch();
         s.close();
     }
