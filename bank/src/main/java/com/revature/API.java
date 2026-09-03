@@ -8,6 +8,8 @@ public class API {
     private String accountID;
     private String pin;
     private HashMap mockDB;
+    // temporary data storage for transactions
+    private ArrayList<String> transactionHistory = new ArrayList<>();
 
     // Constructors
 
@@ -133,7 +135,7 @@ public class API {
                     break;
                 case "v":
                     // same thing here
-                    viewActivity();
+                    viewTransactionActivity();
                     break;
                 case "q":
                     // same thing here
@@ -159,7 +161,13 @@ public class API {
     private void transfer() {
     }
 
-    private void viewActivity() {
+    //yousef
+    // deposit(), withdraw(), and transfer() should all post their result into 
+    //transactionHistory in order to show history
+    private void viewTransactionActivity() {
+        //temporarily adding info into transaction history
+        transactionHistory.add("adding dummy history for now");
+        System.out.println(transactionHistory);
     }
 
     // Main
