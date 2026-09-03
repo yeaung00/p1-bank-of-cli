@@ -35,10 +35,14 @@ public class API {
                 String pin = s.nextLine();
 
                 // Call login to determine if the login was successful
-                login(accountID, pin);
-
-                // Leads to the application quitting
-                break;
+                //if login was unsuccessful, then reprompt login screen
+                if (!login(accountID, pin)) {
+                    continue;
+                }
+                else {
+                    // Leads to the application quitting
+                    break;
+                }
 
             // Register = 'r'
             } else if (command.equals("r")) {
@@ -74,18 +78,23 @@ public class API {
     }
 
     // Yousef
-    // Class is private because method should only be accessed within class (API) and not outside
-    private void login(String accountID, String pin) {
+    //for now Business.verifyCredentials() is unimplemented until we work on business layer
+    //returns whether or not login was successful
+    private boolean login(String accountID, String pin) {
         try {
-            if(Business.verifyCredentials(accountID, pin)) {
+            //adding first clause for testing
+            if(accountID.equals("Billy") && Business.verifyCredentials(accountID, pin)) {
                 System.out.println("Login Successful!");
                 homeAccountPage(accountID);
+                return true;
             }
             else {
                 System.out.println("Username or password is incorrect, please try again");
+                return false;
             }
         } catch (Exception e) {
             System.out.println("Error: " + e);
+            return false;
         }
     }
 
