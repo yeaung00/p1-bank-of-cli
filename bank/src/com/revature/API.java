@@ -5,6 +5,9 @@ import java.util.*;
 public class API {
     // Attributes
     private Scanner s;
+    private String accountID;
+    private String pin;
+    private HashMap mockDB;
 
     // Constructors
 
@@ -55,6 +58,17 @@ public class API {
     // After you register, it should send you back to the launch to login
     // Ydur
     public void register() {
+        System.out.println("Please Enter your accountID: ");
+        accountID = s.nextLine();
+        System.out.println("Please Enter your PIN: ");
+        pin = s.nextLine();
+        if(mockDB.containsKey(accountID)){
+            System.out.println("This accountID is taken.");
+        }else if (accountID == null || accountID.isEmpty()){
+            System.out.println("Please enter an accountID.");
+        }else {
+            mockDB.put(accountID,pin);
+        }
     }
 
     // Yousef
