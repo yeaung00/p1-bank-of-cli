@@ -152,12 +152,12 @@ public class API {
 
     private void deposit() {
         System.out.print("Please input how much you'd like to deposit: $");
-        double amount = s.nextDouble();
+        // This procedure helps avoid reading in the left-over newline character
+        double amount = Double.parseDouble(s.nextLine());
 
         // Business layer - Call a function that will check whether the deposit is valid.
 
-        System.out.println("You've deposited $" + amount + ". Thank you!");
-        System.out.println("Returning to menu...");
+        System.out.print("You've deposited $" + amount + ". Thank you!\nReturning to menu...\n");
     }
 
     private void withdraw() {
