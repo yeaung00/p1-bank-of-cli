@@ -114,7 +114,7 @@ public class API {
 
             switch (command) {
                 case "b":
-                    viewBalance(accountID);
+                    viewBalance();
                     break;
                 case "d":
                     // I will leave this implementation like this for now
