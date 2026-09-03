@@ -151,6 +151,13 @@ public class API {
     }
 
     private void deposit() {
+        System.out.print("Please input how much you'd like to deposit: $");
+        double amount = s.nextDouble();
+
+        // Business layer - Call a function that will check whether the deposit is valid.
+
+        System.out.println("You've deposited $" + amount + ". Thank you!");
+        System.out.println("Returning to menu...");
     }
 
     private void withdraw() {
