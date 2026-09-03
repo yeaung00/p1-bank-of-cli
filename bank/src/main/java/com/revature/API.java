@@ -18,11 +18,12 @@ public class API {
     // Connor
     public void launch() {
         System.out.println("Welcome to Bank of CLI!");
-        System.out.println("To login, type 'l'. To register, type 'r'. To quit, type 'q'.");
 
         // Query loop to ask the user which command they'd like
         // to execute.
         while (true) {
+            System.out.println("To login, type 'l'. To register, type 'r'. To quit, type 'q'.");
+
             String command = s.nextLine();
 
             // Login = 'l'
@@ -42,7 +43,6 @@ public class API {
             // Register = 'r'
             } else if (command.equals("r")) {
                 register();
-                break;
 
             // Quit = 'q'
             } else if (command.equals("q")) {
@@ -62,12 +62,14 @@ public class API {
         accountID = s.nextLine();
         System.out.println("Please Enter your PIN: ");
         pin = s.nextLine();
-        if(mockDB.containsKey(accountID)){
-            System.out.println("This accountID is taken.");
+        if(accountID.equals("Billy")){
+            System.out.println("This will check to see accountID is taken.");
         }else if (accountID == null || accountID.isEmpty()){
-            System.out.println("Please enter an accountID.");
+            System.out.println("This will check if it's empty.");
+//            System.out.println("Please enter an accountID.");
         }else {
-            mockDB.put(accountID,pin);
+//            mockDB.put(accountID,pin);
+            System.out.println("We would put it into the database");
         }
     }
 
