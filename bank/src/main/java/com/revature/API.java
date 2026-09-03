@@ -16,7 +16,7 @@ public class API {
     //////////////
 
     // Connor
-    public void launch() {
+    private void launch() {
         System.out.println("Welcome to Bank of CLI!");
 
         // Query loop to ask the user which command they'd like
@@ -57,7 +57,7 @@ public class API {
 
     // After you register, it should send you back to the launch to login
     // Ydur
-    public void register() {
+    private void register() {
         System.out.println("Please Enter your accountID: ");
         accountID = s.nextLine();
         System.out.println("Please Enter your PIN: ");
@@ -98,13 +98,6 @@ public class API {
         // in that case, if you return from any of the actions, maybe we should move these into the while loop?
         // same sort of reasoning with the text in launch()
         System.out.println("Welcome " + accountID + " to your home page! What would you like to do?");
-        System.out.println("Please use the following options to perform your actions: \n" +
-                "Type 'b' to view your balance.\n" +
-                "Type 'd' to deposit an amount into your account.\n" +
-                "Type 'w' to withdraw an amount from your account.\n" +
-                "Type 't' to transfer an amount from one account to another.\n" +
-                "Type 'v' to view previous account activity.\n" +
-                "Type 'q' to quit to the main menu");
 
         /*
             design choice between switch cases and if statements:
@@ -112,6 +105,13 @@ public class API {
          */
         boolean isQuit = false;
         while (!isQuit) {
+            System.out.println("Please use the following options to perform your actions: \n" +
+                    "Type 'b' to view your balance.\n" +
+                    "Type 'd' to deposit an amount into your account.\n" +
+                    "Type 'w' to withdraw an amount from your account.\n" +
+                    "Type 't' to transfer an amount from one account to another.\n" +
+                    "Type 'v' to view previous account activity.\n" +
+                    "Type 'q' to quit to the main menu");
             String command = s.nextLine();
 
             switch (command) {
@@ -147,19 +147,19 @@ public class API {
     }
 
     // First come first serve for these 5
-    public void viewBalance() {
+    private void viewBalance() {
     }
 
-    public void deposit() {
+    private void deposit() {
     }
 
-    public void withdraw() {
+    private void withdraw() {
     }
 
-    public void transfer() {
+    private void transfer() {
     }
 
-    public void viewActivity() {
+    private void viewActivity() {
     }
 
     // Main
