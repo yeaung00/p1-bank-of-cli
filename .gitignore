@@ -1,0 +1,5 @@
+# IntelliJ compiler output
+out/
+
+# Maven build output
+target/

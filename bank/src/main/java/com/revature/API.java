@@ -16,13 +16,14 @@ public class API {
     //////////////
 
     // Connor
-    public void launch() {
+    private void launch() {
         System.out.println("Welcome to Bank of CLI!");
-        System.out.println("To login, type 'l'. To register, type 'r'. To quit, type 'q'.");
 
         // Query loop to ask the user which command they'd like
         // to execute.
         while (true) {
+            System.out.println("To login, type 'l'. To register, type 'r'. To quit, type 'q'.");
+
             String command = s.nextLine();
 
             // Login = 'l'
@@ -42,7 +43,6 @@ public class API {
             // Register = 'r'
             } else if (command.equals("r")) {
                 register();
-                break;
 
             // Quit = 'q'
             } else if (command.equals("q")) {
@@ -57,17 +57,19 @@ public class API {
 
     // After you register, it should send you back to the launch to login
     // Ydur
-    public void register() {
+    private void register() {
         System.out.println("Please Enter your accountID: ");
         accountID = s.nextLine();
         System.out.println("Please Enter your PIN: ");
         pin = s.nextLine();
-        if(mockDB.containsKey(accountID)){
-            System.out.println("This accountID is taken.");
+        if(accountID.equals("Billy")){
+            System.out.println("This will check to see accountID is taken.");
         }else if (accountID == null || accountID.isEmpty()){
-            System.out.println("Please enter an accountID.");
+            System.out.println("This will check if it's empty.");
+//            System.out.println("Please enter an accountID.");
         }else {
-            mockDB.put(accountID,pin);
+//            mockDB.put(accountID,pin);
+            System.out.println("We would put it into the database");
         }
     }
 
@@ -96,13 +98,6 @@ public class API {
         // in that case, if you return from any of the actions, maybe we should move these into the while loop?
         // same sort of reasoning with the text in launch()
         System.out.println("Welcome " + accountID + " to your home page! What would you like to do?");
-        System.out.println("Please use the following options to perform your actions: \n" +
-                "Type 'b' to view your balance.\n" +
-                "Type 'd' to deposit an amount into your account.\n" +
-                "Type 'w' to withdraw an amount from your account.\n" +
-                "Type 't' to transfer an amount from one account to another.\n" +
-                "Type 'v' to view previous account activity.\n" +
-                "Type 'q' to quit to the main menu");
 
         /*
             design choice between switch cases and if statements:
@@ -110,11 +105,18 @@ public class API {
          */
         boolean isQuit = false;
         while (!isQuit) {
+            System.out.println("Please use the following options to perform your actions: \n" +
+                    "Type 'b' to view your balance.\n" +
+                    "Type 'd' to deposit an amount into your account.\n" +
+                    "Type 'w' to withdraw an amount from your account.\n" +
+                    "Type 't' to transfer an amount from one account to another.\n" +
+                    "Type 'v' to view previous account activity.\n" +
+                    "Type 'q' to quit to the main menu");
             String command = s.nextLine();
 
             switch (command) {
                 case "b":
-                    viewBalance(accountID);
+                    viewBalance();
                     break;
                 case "d":
                     // I will leave this implementation like this for now
@@ -145,19 +147,19 @@ public class API {
     }
 
     // First come first serve for these 5
-    public void viewBalance() {
+    private void viewBalance() {
     }
 
-    public void deposit() {
+    private void deposit() {
     }
 
-    public void withdraw() {
+    private void withdraw() {
     }
 
-    public void transfer() {
+    private void transfer() {
     }
 
-    public void viewActivity() {
+    private void viewActivity() {
     }
 
     // Main
