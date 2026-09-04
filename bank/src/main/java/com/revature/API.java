@@ -154,7 +154,11 @@ public class API {
     }
 
     // First come first serve for these 5
+
+    // viewBalance: Displays the current balance of the account
     private void viewBalance() {
+        // This method will call the business layer to get the balance of the account
+        System.out.println("Your current balance is: [insert value here]");
     }
 
     private void deposit() {
