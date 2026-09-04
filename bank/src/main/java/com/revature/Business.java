@@ -12,17 +12,17 @@ public class Business {
     
     // Checks if the deposit is valid (Is the amount positive?)
     public static boolean validDeposit(String accountID, double amount) {
-
+        return true;
     }
 
     // Checks if the withdraw is valid (Do they have enough? Is the amount positive?)
     public static boolean validWithdraw(String accountID, double amount) {
-
+        return true;
     }
 
     // Checks if the transfer is valid (Does the other person have enough? Do you? Is the amount positive?)
     public static boolean validTransfer(String accountIDFrom, String accountIDTo, double amount) {
-
+        return true;
     }
 
     // Gets the account activity from the repository layer
