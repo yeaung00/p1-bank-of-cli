@@ -36,11 +36,7 @@ public class API {
 
                 // Call login to determine if the login was successful
                 //if login was unsuccessful, then reprompt login screen
-                if (!login(accountID, pin)) {
-                    continue;
-                }
-                else {
-                    // Leads to the application quitting
+                if (login(accountID, pin)) {
                     break;
                 }
 
