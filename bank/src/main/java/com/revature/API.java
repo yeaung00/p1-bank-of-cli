@@ -151,8 +151,7 @@ public class API {
     // viewBalance: Displays the current balance of the account
     private void viewBalance() {
         // This method will call the business layer to get the balance of the account
-        // TODO: Implement and call the method from the business layer
-        System.out.println("Your current balance is: $100");
+        System.out.println("Your current balance is: [insert value here]");
     }
 
     private void deposit() {
