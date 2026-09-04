@@ -8,6 +8,8 @@ public class API {
     private String accountID;
     private String pin;
     private HashMap mockDB;
+    // temporary data storage for transactions
+    private ArrayList<String> transactionHistory = new ArrayList<>();
 
     // Constructors
 
@@ -35,10 +37,10 @@ public class API {
                 String pin = s.nextLine();
 
                 // Call login to determine if the login was successful
-                login(accountID, pin);
-
-                // Leads to the application quitting
-                break;
+                //if login was unsuccessful, then reprompt login screen
+                if (login(accountID, pin)) {
+                    break;
+                }
 
             // Register = 'r'
             } else if (command.equals("r")) {
@@ -74,18 +76,23 @@ public class API {
     }
 
     // Yousef
-    // Class is private because method should only be accessed within class (API) and not outside
-    private void login(String accountID, String pin) {
+    //for now Business.verifyCredentials() is unimplemented until we work on business layer
+    //returns whether or not login was successful
+    private boolean login(String accountID, String pin) {
         try {
-            if(Business.verifyCredentials(accountID, pin)) {
+            //adding first clause for testing
+            if(accountID.equals("Billy") && Business.verifyCredentials(accountID, pin)) {
                 System.out.println("Login Successful!");
                 homeAccountPage(accountID);
+                return true;
             }
             else {
                 System.out.println("Username or password is incorrect, please try again");
+                return false;
             }
         } catch (Exception e) {
             System.out.println("Error: " + e);
+            return false;
         }
     }
 
@@ -133,7 +140,7 @@ public class API {
                     break;
                 case "v":
                     // same thing here
-                    viewActivity();
+                    viewTransactionActivity();
                     break;
                 case "q":
                     // same thing here
@@ -147,7 +154,11 @@ public class API {
     }
 
     // First come first serve for these 5
+
+    // viewBalance: Displays the current balance of the account
     private void viewBalance() {
+        // This method will call the business layer to get the balance of the account
+        System.out.println("Your current balance is: [insert value here]");
     }
 
     private void deposit() {
@@ -162,11 +173,24 @@ public class API {
 
     private void withdraw() {
     }
-
+    // Ye
     private void transfer() {
+        System.out.println("Please input the account ID you'd like to transfer to.");
+        String  toId = s.nextLine();
+        System.out.println("Please input transfer amount.");
+        double amount = Double.parseDouble(s.nextLine());
+        // Business Layer validates transaction
+        // Business.transfer(fromId, toId, amount)
+        System.out.println("You've transferred $" + amount + " to " + toId + ".");
     }
 
-    private void viewActivity() {
+    //yousef
+    // deposit(), withdraw(), and transfer() should all post their result into 
+    //transactionHistory in order to show history
+    private void viewTransactionActivity() {
+        //temporarily adding info into transaction history
+        transactionHistory.add("adding dummy history for now");
+        System.out.println(transactionHistory);
     }
 
     // Main
