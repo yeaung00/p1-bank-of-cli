@@ -155,8 +155,15 @@ public class API {
 
     private void withdraw() {
     }
-
+    // Ye
     private void transfer() {
+        System.out.println("Please input the account ID you'd like to transfer to.");
+        String  toId = s.nextLine();
+        System.out.println("Please input transfer amount.");
+        double amount = Double.parseDouble(s.nextLine());
+        // Business Layer validates transaction
+        // Business.transfer(fromId, toId, amount)
+        System.out.println("You've transferred $" + amount + " to " + toId + ".");
     }
 
     private void viewActivity() {
