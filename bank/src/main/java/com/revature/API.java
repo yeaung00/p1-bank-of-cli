@@ -8,6 +8,7 @@ public class API {
     private String accountID;
     private String pin;
     private HashMap mockDB;
+    double amount;
     // temporary data storage for transactions
     private ArrayList<String> transactionHistory = new ArrayList<>();
 
@@ -164,7 +165,7 @@ public class API {
     private void deposit() {
         System.out.print("Please input how much you'd like to deposit: $");
         // This procedure helps avoid reading in the left-over newline character
-        double amount = Double.parseDouble(s.nextLine());
+        amount = Double.parseDouble(s.nextLine());
 
         // Business layer - Call a function that will check whether the deposit is valid.
 
@@ -173,16 +174,21 @@ public class API {
 
     private void withdraw() {
         System.out.println("Please input how much you would like to withdraw");
-        double amount = Double.parseDouble(s.nextLine());
+        amount = Double.parseDouble(s.nextLine());
         //Business Layer - Calla  func to validate withdraw amount
-        System.out.println("$"+ amount + " has been successfully withdrawn from your account.");
+        if(Business.validWithdraw("Billy",amount)){
+            System.out.println("$"+ amount + " has been successfully withdrawn from your account.");
+        } else {
+            System.out.println("Invalid amount ,please try again.");
+        }
     }
+
     // Ye
     private void transfer() {
         System.out.println("Please input the account ID you'd like to transfer to.");
         String  toId = s.nextLine();
         System.out.println("Please input transfer amount.");
-        double amount = Double.parseDouble(s.nextLine());
+        amount = Double.parseDouble(s.nextLine());
         // Business Layer validates transaction
         // Business.transfer(fromId, toId, amount)
         System.out.println("You've transferred $" + amount + " to " + toId + ".");

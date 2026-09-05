@@ -17,7 +17,12 @@ public class Business {
 
     // Checks if the withdraw is valid (Do they have enough? Is the amount positive?)
     public static boolean validWithdraw(String accountID, double amount) {
-        return true;
+        //If amount is more than in the account, a negative number,a non number , invalid
+        if(amount > 5 ) {
+            return true;
+        }else {
+            return false;
+        }
     }
 
     // Checks if the transfer is valid (Does the other person have enough? Do you? Is the amount positive?)
