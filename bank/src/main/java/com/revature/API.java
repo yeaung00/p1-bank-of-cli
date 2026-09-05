@@ -172,6 +172,10 @@ public class API {
     }
 
     private void withdraw() {
+        System.out.println("Please input how much you would like to withdraw");
+        double amount = Double.parseDouble(s.nextLine());
+        //Business Layer - Calla  func to validate withdraw amount
+        System.out.println("$"+ amount + " has been successfully withdrawn from your account.");
     }
     // Ye
     private void transfer() {
