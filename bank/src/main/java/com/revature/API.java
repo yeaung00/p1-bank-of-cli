@@ -7,7 +7,6 @@ public class API {
     private Scanner s;
     private String accountID;
     private String pin;
-    private HashMap mockDB;
     // temporary data storage for transactions
     private ArrayList<String> transactionHistory = new ArrayList<>();
 
@@ -158,7 +157,10 @@ public class API {
     // viewBalance: Displays the current balance of the account
     private void viewBalance() {
         // This method will call the business layer to get the balance of the account
-        System.out.println("Your current balance is: [insert value here]");
+//        System.out.println("Your current balance is: [insert value here]");
+
+        // dummy business call
+        Business.viewBalance();
     }
 
     private void deposit() {
