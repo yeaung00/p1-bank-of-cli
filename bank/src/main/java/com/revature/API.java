@@ -29,15 +29,9 @@ public class API {
 
             // Login = 'l'
             if (command.equals("l")) {
-                // Prompt the user for their account ID and PIN
-                System.out.print("Welcome to the login screen. Please provide your Account ID: ");
-                String accountID = s.nextLine();
-                System.out.print("\nPlease provide your PIN: ");
-                String pin = s.nextLine();
-
                 // Call login to determine if the login was successful
                 //if login was unsuccessful, then reprompt login screen
-                if (login(accountID, pin)) {
+                if (login()) {
                     break;
                 }
 
@@ -77,8 +71,12 @@ public class API {
     // Yousef
     //for now Business.verifyCredentials() is unimplemented until we work on business layer
     //returns whether or not login was successful
-    private boolean login(String accountID, String pin) {
+    private boolean login() {
         try {
+            System.out.print("Welcome to the login screen. Please provide your Account ID: ");
+            String accountID = s.nextLine();
+            System.out.print("\nPlease provide your PIN: ");
+            String pin = s.nextLine();
             //adding first clause for testing
             if(accountID.equals("Billy") && Business.verifyCredentials(accountID, pin)) {
                 System.out.println("Login Successful!");
