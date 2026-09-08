@@ -22,6 +22,14 @@ public class Business {
 
     // Checks if the transfer is valid (Does the other person have enough? Do you? Is the amount positive?)
     public static boolean validTransfer(String accountIDFrom, String accountIDTo, double amount) {
+        if (accountIDFrom == accountIDTo) {
+            return false  
+        } else if (amount <= 0) {
+            return false
+        }
+        // check if accountIDFrom has sufficient funds
+        // check if accountIDTo exists
+        // if valid, add transfer to transaction history
         return true;
     }
 
