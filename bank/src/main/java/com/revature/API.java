@@ -26,15 +26,15 @@ public class API {
         while (true) {
             System.out.println("To login, type 'l'. To register, type 'r'. To quit, type 'q'.");
 
-            String command = s.nextLine();~
+            String command = s.nextLine();
 
-            // Login ~= 'l'
+            // Login = 'l'
             if (command.equals("l")) {
                 // Prompt the user for their account ID and PIN
                 System.out.print("Welcome to the login screen. Please provide your Account ID: ");
                 String accountID = s.nextLine();
                 System.out.print("\nPlease provide your PIN: ");
-                String pin = ~s.nextLine();
+                String pin = s.nextLine();
 
                 // Call login to determine if the login was successful
                 //if login was unsuccessful, then reprompt login screen
