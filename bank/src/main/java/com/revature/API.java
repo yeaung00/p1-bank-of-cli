@@ -160,7 +160,7 @@ public class API {
 //        System.out.println("Your current balance is: [insert value here]");
 
         // dummy business call
-        Business.viewBalance();
+        Business.viewBalance(this.accountID);
     }
 
     private void deposit() {
