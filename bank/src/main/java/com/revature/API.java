@@ -160,13 +160,26 @@ public class API {
     }
 
     private void deposit() {
-        System.out.print("Please input how much you'd like to deposit: $");
-        // This procedure helps avoid reading in the left-over newline character
-        double amount = Double.parseDouble(s.nextLine());
-
-        // Business layer - Call a function that will check whether the deposit is valid.
-
-        System.out.print("You've deposited $" + amount + ". Thank you!\nReturning to menu...\n");
+        while (true) {
+            System.out.print("Please input how much you'd like to deposit. Press 'q' to return to the main menu\n$");
+            // This procedure helps avoid reading in the left-over newline character
+            String input = s.nextLine();
+            try {
+                double amount = Double.parseDouble(input);
+                if (Business.validDeposit(accountID, amount)) {
+                    System.out.print("You've deposited $" + amount + ". Thank you!\n");
+                    break;
+                }
+                // Would need to move this somewhere later
+                System.out.println("Deposit failed! Please try again.");
+            } catch (NumberFormatException e) {
+                if (input.equals("q")) {
+                    break;
+                } else {
+                    System.out.println("Invalid input. Please try again.");
+                }
+            }
+        }
     }
 
     private void withdraw() {
