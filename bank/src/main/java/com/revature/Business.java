@@ -1,5 +1,7 @@
 package com.revature;
 
+import com.revature.Exceptions.NegativeInputException;
+
 public class Business {
     // Ydur
     public static boolean verifyRegistration(String accountID) {
@@ -17,15 +19,15 @@ public class Business {
     }
     
     // Checks if the deposit is valid (Is the amount positive?) - Connor
-    public static boolean validDeposit(String accountID, double amount) {
+    public static boolean validDeposit(String accountID, double amount) throws NegativeInputException {
         // If the amount is negataive, it is not a valid deposit
         if (amount < 0) {
-            return false;
+            throw new NegativeInputException("You cannot input a negative amount to deposit. ");
         }
 
         // Send a request to the repo layer to update the balance to total
         double total = viewBalance(accountID) + amount;
-        System.out.println("This would send the deposit request to the Repo layer");
+        System.out.println("This would send the deposit request to the Repo layer...");
 
         // Return true if everything above succeeds
         return true;

@@ -2,6 +2,8 @@ package com.revature;
 
 import java.util.*;
 
+import com.revature.Exceptions.NegativeInputException;
+
 public class API {
     // Attributes
     private Scanner s;
@@ -178,6 +180,8 @@ public class API {
                 } else {
                     System.out.println("Invalid input. Please try again.");
                 }
+            } catch (NegativeInputException e) {
+                System.out.println(e.getMessage() + "Please try again.");
             }
         }
     }
