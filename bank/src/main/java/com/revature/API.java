@@ -3,6 +3,7 @@ package com.revature;
 import java.util.*;
 
 import com.revature.Exceptions.NegativeInputException;
+import java.util.concurrent.TimeUnit;
 
 public class API {
     // Attributes
@@ -162,14 +163,28 @@ public class API {
     }
 
     private void deposit() {
+        // Print statement that clears the terminal (depends on which one you're on though; we might need to test this more).
+        System.out.print("\033[2J");
+        System.out.println(
+            "///////////////\n" +
+            "/// Deposit ///\n" +
+            "///////////////");
+        System.out.println("Please input how much you'd like to deposit. Press 'q' to return to the main menu.");
         while (true) {
-            System.out.print("Please input how much you'd like to deposit. Press 'q' to return to the main menu\n$");
-            // This procedure helps avoid reading in the left-over newline character
+            System.out.print("$");
             String input = s.nextLine();
             try {
                 double amount = Double.parseDouble(input);
                 if (Business.validDeposit(accountID, amount)) {
-                    System.out.print("You've deposited $" + amount + ". Thank you!\n");
+                    System.out.print("You've deposited $" + amount + ". Thank you!\nRedirecting to home screen...");
+
+                    // Wait 3 seconds to clear the terminal and redirect to home screen
+                    try {
+                        TimeUnit.SECONDS.sleep(4);
+                        System.out.print("\033[2J");
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                    }
                     break;
                 }
                 // Would need to move this somewhere later
