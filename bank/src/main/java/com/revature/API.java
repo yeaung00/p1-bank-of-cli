@@ -3,6 +3,7 @@ package com.revature;
 import java.util.*;
 
 import com.revature.Exceptions.NegativeInputException;
+import com.revature.Exceptions.MoreThanTwoDecimalPlacesException;
 import java.util.concurrent.TimeUnit;
 
 public class API {
@@ -196,6 +197,8 @@ public class API {
                     System.out.println("Invalid input. Please try again.");
                 }
             } catch (NegativeInputException e) {
+                System.out.println(e.getMessage() + "Please try again.");
+            } catch (MoreThanTwoDecimalPlacesException e) {
                 System.out.println(e.getMessage() + "Please try again.");
             }
         }

@@ -1,6 +1,8 @@
 package com.revature;
 
 import com.revature.Exceptions.NegativeInputException;
+import com.revature.Exceptions.MoreThanTwoDecimalPlacesException;
+import java.math.BigDecimal;
 
 public class Business {
     // Ydur
@@ -19,10 +21,12 @@ public class Business {
     }
     
     // Checks if the deposit is valid (Is the amount positive?) - Connor
-    public static boolean validDeposit(String accountID, double amount) throws NegativeInputException {
+    public static boolean validDeposit(String accountID, double amount) throws NegativeInputException, MoreThanTwoDecimalPlacesException {
         // If the amount is negataive, it is not a valid deposit
         if (amount < 0) {
             throw new NegativeInputException("You cannot input a negative amount to deposit. ");
+        } else if (hasAtMostTwoDecimalPlaces(amount)) {
+            throw new MoreThanTwoDecimalPlacesException("The amount cannot have more than two decimal places. ");
         }
 
         // Send a request to the repo layer to update the balance to total
@@ -31,6 +35,16 @@ public class Business {
 
         // Return true if everything above succeeds
         return true;
+    }
+
+    private static boolean hasAtMostTwoDecimalPlaces(double amount) {
+        // Convert the double to a String, and then to a BigDecimal
+        String text = Double.toString(amount);
+        BigDecimal bd = new BigDecimal(text);
+
+        // Checks if the amount has at most 2 decimal places (can't deposit $100.345)
+        int decimalPlaces = bd.scale();
+        return decimalPlaces < 0 || decimalPlaces > 2;
     }
 
     // Checks if the withdraw is valid (Do they have enough? Is the amount positive?) - Ydur
