@@ -37,6 +37,12 @@ public class Business {
         return true;
     }
 
+    /* Deposit (and perhaps withdraw) helper function
+     * ----------------------------------------------
+     *
+     * Checks if the amount you want to deposit has at most two decimal places.
+     * E.g, $100.45 would return true, $100.456 would return false.
+     */
     private static boolean hasAtMostTwoDecimalPlaces(double amount) {
         // Convert the double to a String, and then to a BigDecimal
         String text = Double.toString(amount);
