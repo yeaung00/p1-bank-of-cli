@@ -7,8 +7,20 @@ public class Business {
     }
 
     // Yousef
-    public static boolean verifyCredentials(String AcountID, String PIN) {
-        return true;
+    // This method verifies both the account id and pin pair by checking the db if it contains it
+    // This method can throw an exception if the repo layer encounters an error with not finding the respective credentials
+    public static boolean verifyCredentials (String accountID, String pin) throws InvalidCredentialsException {
+        // make call to repository layer to check for AccountID and pin pair in future
+        // for now just check if accountID = "Billy" to test all branch flows
+        if(accountID.equals("Billy")){
+            return true;
+        }
+        else {
+            //We should make the message for the exceptions in the business layer more verbose for better debugging,
+            //then when we pass the exception down to the api layer, make it less verbose to hide implementation detail
+            //ex: we could have the message here explain exactly which part was invalid ("account id, pin, or both")
+            throw new InvalidCredentialsException("Invalid Account ID or PIN");
+        }
     }
 
     // Gets the balance from the Repository layer - Damon
