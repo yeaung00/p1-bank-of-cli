@@ -2,6 +2,10 @@ package com.revature;
 
 import java.util.*;
 
+import com.revature.Exceptions.NegativeInputException;
+import com.revature.Exceptions.MoreThanTwoDecimalPlacesException;
+import java.util.concurrent.TimeUnit;
+
 public class API {
     // Attributes
     private Scanner s;
@@ -10,6 +14,8 @@ public class API {
     private HashMap mockDB;
     // temporary data storage for transactions
     private ArrayList<String> transactionHistory = new ArrayList<>();
+
+    private static String clearScreen = "\033[2J";
 
     // Constructors
 
@@ -160,13 +166,45 @@ public class API {
     }
 
     private void deposit() {
-        System.out.print("Please input how much you'd like to deposit: $");
-        // This procedure helps avoid reading in the left-over newline character
-        double amount = Double.parseDouble(s.nextLine());
+        // Print statement that clears the terminal (depends on which one you're on though; we might need to test this more).
+        System.out.print(clearScreen);
+        System.out.println(
+            "///////////////\n" +
+            "/// Deposit ///\n" +
+            "///////////////");
+        System.out.println("Please input how much you'd like to deposit. Press 'q' to return to the main menu.");
+        while (true) {
+            System.out.print("$");
+            String input = s.nextLine();
+            try {
+                double amount = Double.parseDouble(input);
+                if (Business.validDeposit(accountID, amount)) {
+                    System.out.print("You've deposited $" + amount + ". Thank you!\nRedirecting to home screen...\n");
 
-        // Business layer - Call a function that will check whether the deposit is valid.
-
-        System.out.print("You've deposited $" + amount + ". Thank you!\nReturning to menu...\n");
+                    // Wait 3 seconds to clear the terminal and redirect to home screen
+                    try {
+                        TimeUnit.SECONDS.sleep(4);
+                        System.out.print(clearScreen);
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                    }
+                    break;
+                }
+                // Would need to move this somewhere later
+                System.out.println("Deposit failed! Please try again.");
+            } catch (NumberFormatException e) {
+                if (input.equals("q")) {
+                    System.out.print(clearScreen);
+                    break;
+                } else {
+                    System.out.println("Invalid input. Please try again.");
+                }
+            } catch (NegativeInputException e) {
+                System.out.println(e.getMessage() + "Please try again.");
+            } catch (MoreThanTwoDecimalPlacesException e) {
+                System.out.println(e.getMessage() + "Please try again.");
+            }
+        }
     }
 
     private void withdraw() {
