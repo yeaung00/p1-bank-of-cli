@@ -25,7 +25,7 @@ public class Business {
         // If the amount is negataive, it is not a valid deposit
         if (amount < 0) {
             throw new NegativeInputException("You cannot input a negative amount to deposit. ");
-        } else if (hasAtMostTwoDecimalPlaces(amount)) {
+        } else if (!hasAtMostTwoDecimalPlaces(amount)) {
             throw new MoreThanTwoDecimalPlacesException("The amount cannot have more than two decimal places. ");
         }
 
@@ -50,7 +50,7 @@ public class Business {
 
         // Checks if the amount has at most 2 decimal places (can't deposit $100.345)
         int decimalPlaces = bd.scale();
-        return decimalPlaces < 0 || decimalPlaces > 2;
+        return decimalPlaces >= 0 && decimalPlaces <= 2;
     }
 
     // Checks if the withdraw is valid (Do they have enough? Is the amount positive?) - Ydur
