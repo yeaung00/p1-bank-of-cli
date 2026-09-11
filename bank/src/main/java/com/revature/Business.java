@@ -32,7 +32,18 @@ public class Business {
     }
 
     // Gets the account activity from the repository layer - Yousef
-    public static void viewActivity(String accountID) {
-
+    // for now just returns a string, but in future will return rows of data
+    //maybe can create class reprenting a row of data then use a collections class like
+    //Arraylist to store the data
+    //ArrayList<Transaction> = new ArrayList<>();
+    public static String getTransactionActivity(String accountID) throws EmptyTransactionActivityException{
+        // just testing full logic flow, we would call a method in repository layer here that fetches
+        // transaction activity
+        if(accountID.equals("Billy")) {
+            return "here we would return data from db";
+        }
+        else {
+            throw new EmptyTransactionActivityException("No transaction activity found for account: " + accountID);
+        }
     }
 }
