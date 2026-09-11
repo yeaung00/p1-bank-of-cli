@@ -136,7 +136,7 @@ public class API {
                     break;
                 case "v":
                     // same thing here
-                    transactionActivity(accountID);
+                    transactionHistory(accountID);
                     break;
                 case "q":
                     // same thing here
@@ -186,10 +186,10 @@ public class API {
 
     //yousef
     // displays transaction activity from db
-    private void transactionActivity(String accountID) {
+    private void transactionHistory(String accountID) {
         //temporarily adding info into transaction history
         try{
-            String res = Business.getTransactionActivity(accountID);
+            String res = Business.validateTransactionHistory(accountID);
             System.out.println(res);
         } catch(Exception e) {
             System.out.println("Error:" + e);

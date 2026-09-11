@@ -36,8 +36,8 @@ public class Business {
     //maybe can create class reprenting a row of data then use a collections class like
     //Arraylist to store the data
     //ArrayList<Transaction> = new ArrayList<>();
-    public static String getTransactionActivity(String accountID) throws EmptyTransactionActivityException{
-        // just testing full logic flow, we would call a method in repository layer here that fetches
+    public static String validateTransactionHistory(String accountID) throws EmptyTransactionActivityException{
+        // just testing full logic flow, we would call a method(like getTransactionActivity()) in repository layer here that fetches
         // transaction activity
         if(accountID.equals("Billy")) {
             return "here we would return data from db";
