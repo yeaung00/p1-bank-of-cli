@@ -1,6 +1,7 @@
 package com.revature;
 
 import com.revature.Exceptions.NegativeInputException;
+import com.revature.Exceptions.InvalidCredentialsException;
 import com.revature.Exceptions.MoreThanTwoDecimalPlacesException;
 import java.math.BigDecimal;
 
@@ -16,7 +17,9 @@ public class Business {
     public static boolean verifyCredentials (String accountID, String pin) throws InvalidCredentialsException {
         // make call to repository layer to check for AccountID and pin pair in future
         // for now just check if accountID = "Billy" to test all branch flows
-        if(accountID.equals("Billy")){
+
+        // When testing, login with accoundID "Billy" and Pin "4"
+        if(accountID.equals("Billy") && pin.equals("4")){
             return true;
         }
         else {
