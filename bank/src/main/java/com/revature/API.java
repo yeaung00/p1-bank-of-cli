@@ -15,6 +15,8 @@ public class API {
     // temporary data storage for transactions
     private ArrayList<String> transactionHistory = new ArrayList<>();
 
+    private static String clearScreen = "\033[2J";
+
     // Constructors
 
     //////////////
@@ -165,7 +167,7 @@ public class API {
 
     private void deposit() {
         // Print statement that clears the terminal (depends on which one you're on though; we might need to test this more).
-        System.out.print("\033[2J");
+        System.out.print(clearScreen);
         System.out.println(
             "///////////////\n" +
             "/// Deposit ///\n" +
@@ -177,12 +179,12 @@ public class API {
             try {
                 double amount = Double.parseDouble(input);
                 if (Business.validDeposit(accountID, amount)) {
-                    System.out.print("You've deposited $" + amount + ". Thank you!\nRedirecting to home screen...");
+                    System.out.print("You've deposited $" + amount + ". Thank you!\nRedirecting to home screen...\n");
 
                     // Wait 3 seconds to clear the terminal and redirect to home screen
                     try {
                         TimeUnit.SECONDS.sleep(4);
-                        System.out.print("\033[2J");
+                        System.out.print(clearScreen);
                     } catch (InterruptedException e) {
                         Thread.currentThread().interrupt();
                     }
@@ -192,6 +194,7 @@ public class API {
                 System.out.println("Deposit failed! Please try again.");
             } catch (NumberFormatException e) {
                 if (input.equals("q")) {
+                    System.out.print(clearScreen);
                     break;
                 } else {
                     System.out.println("Invalid input. Please try again.");
