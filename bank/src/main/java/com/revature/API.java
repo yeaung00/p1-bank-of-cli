@@ -84,16 +84,11 @@ public class API {
             String accountID = s.nextLine();
             System.out.print("\nPlease provide your PIN: ");
             String pin = s.nextLine();
-            //adding first clause for testing
-            if(accountID.equals("Billy") && Business.verifyCredentials(accountID, pin)) {
-                System.out.println("Login Successful!");
-                homeAccountPage(accountID);
-                return true;
-            }
-            else {
-                System.out.println("Username or password is incorrect, please try again");
-                return false;
-            }
+            Business.verifyCredentials(accountID, pin);
+            System.out.println("Login Successful!");
+            homeAccountPage(accountID);
+            return true;
+
         } catch (Exception e) {
             System.out.println("Error: " + e);
             return false;
