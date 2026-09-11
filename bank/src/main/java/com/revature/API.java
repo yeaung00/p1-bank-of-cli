@@ -12,6 +12,7 @@ public class API {
     private Scanner s;
     private String accountID;
     private String pin;
+    private HashMap mockDB;
     // temporary data storage for transactions
     private ArrayList<String> transactionHistory = new ArrayList<>();
 

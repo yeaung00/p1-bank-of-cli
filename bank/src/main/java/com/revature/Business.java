@@ -30,7 +30,7 @@ public class Business {
         }
     }
 
-    // Gets the balance from the Repository layer
+    // Gets the balance from the Repository layer - Damon
     public static double viewBalance(String accountID) {
         // assuming that there will be a database connection to retrieve the balance for the given accountID
         // for now, we will just print a mock balance
