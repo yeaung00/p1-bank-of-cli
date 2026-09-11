@@ -6,6 +6,8 @@ import com.revature.Exceptions.MoreThanTwoDecimalPlacesException;
 import java.math.BigDecimal;
 
 public class Business {
+
+    private static Account user;
     // Ydur
     public static boolean verifyRegistration(String accountID) {
         return true;
@@ -20,9 +22,11 @@ public class Business {
 
         // When testing, login with accoundID "Billy" and Pin "4"
         if(accountID.equals("Billy") && pin.equals("4")){
+            // The current balance would be whatever is stored in the repo layer
+            double curBalance = 0;
+            user = new Account(accountID, pin, curBalance);
             return true;
-        }
-        else {
+        } else {
             //We should make the message for the exceptions in the business layer more verbose for better debugging,
             //then when we pass the exception down to the api layer, make it less verbose to hide implementation detail
             //ex: we could have the message here explain exactly which part was invalid ("account id, pin, or both")
@@ -32,7 +36,7 @@ public class Business {
 
     // Gets the balance from the Repository layer - Damon
     public static double viewBalance(String accountID) {
-        return 0.0;
+        return user.getBalance();
     }
     
     // Checks if the deposit is valid (Is the amount positive?) - Connor
@@ -45,8 +49,9 @@ public class Business {
         }
 
         // Send a request to the repo layer to update the balance to total
-        double total = viewBalance(accountID) + amount;
+        double total = user.getBalance() + amount;
         System.out.println("This would send the deposit request to the Repo layer...");
+        user.setBalance(total);
 
         // Return true if everything above succeeds
         return true;

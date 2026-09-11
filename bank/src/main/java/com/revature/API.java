@@ -16,6 +16,8 @@ public class API {
     // temporary data storage for transactions
     private ArrayList<String> transactionHistory = new ArrayList<>();
 
+    private Account user;
+
     private static String clearScreen = "\033[2J";
 
     // Constructors
@@ -26,22 +28,22 @@ public class API {
 
     // Connor
     private void launch() {
-        System.out.println("Welcome to Bank of CLI!");
-
         // Query loop to ask the user which command they'd like
         // to execute.
+        System.out.println(
+            "//////////////////////////////////\n" +
+            "/// Welcome to the Bank of CLI ///\n" +
+            "//////////////////////////////////\n");
         while (true) {
-            System.out.println("To login, type 'l'. To register, type 'r'. To quit, type 'q'.");
-
+            System.out.println("Please use the following options to perform your action/s:");
+            System.out.println("To login, type 'l'.\nTo register, type 'r'.\nTo quit, type 'q'.");
             String command = s.nextLine();
 
             // Login = 'l'
             if (command.equals("l")) {
                 // Call login to determine if the login was successful
                 //if login was unsuccessful, then reprompt login screen
-                if (login()) {
-                    break;
-                }
+                login();
 
             // Register = 'r'
             } else if (command.equals("r")) {
@@ -79,20 +81,39 @@ public class API {
     // Yousef
     //for now Business.verifyCredentials() is unimplemented until we work on business layer
     //returns whether or not login was successful
-    private boolean login() {
-        try {
-            System.out.print("Welcome to the login screen. Please provide your Account ID: ");
-            String accountID = s.nextLine();
-            System.out.print("\nPlease provide your PIN: ");
-            String pin = s.nextLine();
-            Business.verifyCredentials(accountID, pin);
-            System.out.println("Login Successful!");
-            homeAccountPage(accountID);
-            return true;
+    private void login() {
+        System.out.print(clearScreen);
+        System.out.println(
+            "/////////////\n" +
+            "/// Login ///\n" +
+            "/////////////");
+        System.out.println("Press 'q' to exit for any reason.");
+        while (true) {
+            try {
+                System.out.print("Please provide your Account ID: ");
+                String accountID = s.nextLine();
 
-        } catch (Exception e) {
-            System.out.println("Error: " + e);
-            return false;
+                if (accountID.equals("q")) {
+                    System.out.print(clearScreen);
+                    break;
+                }
+
+                System.out.print("\nPlease provide your PIN: ");
+                String pin = s.nextLine();
+
+                if (pin.equals("q")) {
+                    System.out.print(clearScreen);
+                    break;
+                }
+            
+                if (Business.verifyCredentials(accountID, pin)) {
+                    System.out.print(clearScreen);
+                    homeAccountPage(accountID);
+                    break;
+                }
+            } catch (InvalidCredentialsException e) {
+                System.out.println(e.getMessage() + ". Please try again.");
+            }
         }
     }
 
@@ -104,7 +125,10 @@ public class API {
         // would we want these messages to print each time you get to this page?
         // in that case, if you return from any of the actions, maybe we should move these into the while loop?
         // same sort of reasoning with the text in launch()
-        System.out.println("Welcome " + accountID + " to your home page! What would you like to do?");
+        System.out.println(
+            "//////////////////////\n" +
+            "/// Welcome, " + accountID + " ///\n" +
+            "//////////////////////\n");
 
         /*
             design choice between switch cases and if statements:
@@ -145,6 +169,7 @@ public class API {
                 case "q":
                     // same thing here
                     isQuit = true;
+                    System.out.print(clearScreen);
                     break;
                 default:
                     System.out.println("Not a valid option. Please try again with a valid option.");
@@ -158,7 +183,7 @@ public class API {
     // viewBalance: Displays the current balance of the account
     private void viewBalance() {
         // This method will call the business layer to get the balance of the account
-        System.out.println("Your current balance is: [insert value here]");
+        System.out.println("Your current balance is: $" + Business.viewBalance(accountID));
     }
 
     private void deposit() {
