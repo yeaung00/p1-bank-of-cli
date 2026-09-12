@@ -32,7 +32,15 @@ public class Business {
 
     // Gets the balance from the Repository layer - Damon
     public static double viewBalance(String accountID) {
-        return 0.0;
+        // assuming that there will be a database connection to retrieve the balance for the given accountID
+        // for now, we will just print a mock balance
+        double balance = 1000.00; // Mock balance for now
+        /*
+            Generally, how it will look with a database connection:
+            double balance = database.getBalance(accountID);
+            System.out.println("Your current balance is: $" + balance);
+         */
+        return balance;
     }
     
     // Checks if the deposit is valid (Is the amount positive?) - Connor
