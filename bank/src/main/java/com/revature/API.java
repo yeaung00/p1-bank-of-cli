@@ -13,8 +13,6 @@ public class API {
     private String accountID;
     private String pin;
     private HashMap mockDB;
-    // temporary data storage for transactions
-    private ArrayList<String> transactionHistory = new ArrayList<>();
 
     private static String clearScreen = "\033[2J";
 
@@ -140,7 +138,7 @@ public class API {
                     break;
                 case "v":
                     // same thing here
-                    viewTransactionActivity();
+                    transactionHistory(accountID);
                     break;
                 case "q":
                     // same thing here
@@ -158,7 +156,10 @@ public class API {
     // viewBalance: Displays the current balance of the account
     private void viewBalance() {
         // This method will call the business layer to get the balance of the account
-        System.out.println("Your current balance is: [insert value here]");
+//        System.out.println("Your current balance is: [insert value here]");
+
+        // dummy business call
+        Business.viewBalance(this.accountID);
     }
 
     private void deposit() {
@@ -221,12 +222,15 @@ public class API {
     }
 
     //yousef
-    // deposit(), withdraw(), and transfer() should all post their result into 
-    //transactionHistory in order to show history
-    private void viewTransactionActivity() {
+    // displays transaction activity from db
+    private void transactionHistory(String accountID) {
         //temporarily adding info into transaction history
-        transactionHistory.add("adding dummy history for now");
-        System.out.println(transactionHistory);
+        try{
+            String res = Business.validateTransactionHistory(accountID);
+            System.out.println(res);
+        } catch(Exception e) {
+            System.out.println("Error:" + e);
+        }
     }
 
     // Main
