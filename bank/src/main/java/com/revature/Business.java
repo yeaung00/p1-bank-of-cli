@@ -1,5 +1,6 @@
 package com.revature;
 
+import com.revature.Exceptions.InsufficientFundsException;
 import com.revature.Exceptions.NegativeInputException;
 import com.revature.Exceptions.InvalidCredentialsException;
 import com.revature.Exceptions.MoreThanTwoDecimalPlacesException;
@@ -68,14 +69,13 @@ public class Business {
         return decimalPlaces >= 0 && decimalPlaces <= 2;
     }
 
-    // Checks if the withdraw is valid (Do they have enough? Is the amount positive?) - Ydur
-    public static boolean validWithdraw(String accountID, double amount) {
+    // Checks if the withdrawal is valid (Do they have enough? Is the amount positive?) - Ydur
+    public static boolean validWithdraw(String accountID, double amount) throws InsufficientFundsException {
         //If amount is more than in the account, a negative number,a non number , invalid
-        if(amount > 5 ) {
-            return true;
-        }else {
-            return false;
+        if(amount > Business.viewBalance(accountID)) {
+            throw new InsufficientFundsException("The amount withdrawn cannot be more than the account balance");
         }
+        return true;
     }
 
     // Checks if the transfer is valid (Does the other person have enough? Do you? Is the amount positive?) - Ye

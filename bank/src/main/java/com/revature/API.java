@@ -1,10 +1,14 @@
 package com.revature;
 
+import java.sql.SQLOutput;
 import java.util.*;
 
+import com.revature.Exceptions.InsufficientFundsException;
 import com.revature.Exceptions.NegativeInputException;
 import com.revature.Exceptions.MoreThanTwoDecimalPlacesException;
 import com.revature.Exceptions.InvalidCredentialsException;
+
+import javax.sound.midi.Soundbank;
 import java.util.concurrent.TimeUnit;
 
 public class API {
@@ -206,7 +210,13 @@ public class API {
     private void withdraw() {
         System.out.println("Please input how much you would like to withdraw");
         double amount = Double.parseDouble(s.nextLine());
-        //Business Layer - Calla  func to validate withdraw amount
+        //Business Layer - Call a  func to validate withdraw amount
+        try{
+            Business.validWithdraw(accountID,amount);
+        }
+        catch (InsufficientFundsException e){
+            System.out.println("Withdrawal failed due to: " + e);
+        }
         System.out.println("$"+ amount + " has been successfully withdrawn from your account.");
     }
     // Ye
