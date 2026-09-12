@@ -18,7 +18,7 @@ public class API {
     private String pin;
     private HashMap mockDB;
 
-    private static String clearScreen = "\033[2J";
+    private static String clearScreen = "\n\n\n\n\n";
 
     // Constructors
 
@@ -88,6 +88,7 @@ public class API {
             System.out.print("\nPlease provide your PIN: ");
             String pin = s.nextLine();
             Business.verifyCredentials(accountID, pin);
+            System.out.println(clearScreen);
             System.out.println("Login Successful!");
             homeAccountPage(accountID);
             return true;
@@ -114,13 +115,14 @@ public class API {
          */
         boolean isQuit = false;
         while (!isQuit) {
-            System.out.println("Please use the following options to perform your actions: \n" +
-                    "Type 'b' to view your balance.\n" +
+            System.out.println("Please use the following options to perform your actions: \n\n" +
+                    "Type 'b' to view your balance.                    || " +
                     "Type 'd' to deposit an amount into your account.\n" +
-                    "Type 'w' to withdraw an amount from your account.\n" +
+                    "Type 'w' to withdraw an amount from your account. || " +
                     "Type 't' to transfer an amount from one account to another.\n" +
-                    "Type 'v' to view previous account activity.\n" +
+                    "Type 'v' to view previous account activity.       || " +
                     "Type 'q' to quit to the main menu");
+            System.out.print(">>");
             String command = s.nextLine();
 
             switch (command) {
@@ -160,10 +162,10 @@ public class API {
     // viewBalance: Displays the current balance of the account
     private void viewBalance() {
         // This method will call the business layer to get the balance of the account
-//        System.out.println("Your current balance is: [insert value here]");
+        System.out.println(clearScreen);
+        System.out.println("Your current balance is: " + Business.viewBalance(this.accountID));
 
         // dummy business call
-        Business.viewBalance(this.accountID);
     }
 
     private void deposit() {
@@ -210,15 +212,39 @@ public class API {
 
     private void withdraw() {
         System.out.println("Please input how much you would like to withdraw");
-        double amount = Double.parseDouble(s.nextLine());
-        //Business Layer - Call a  func to validate withdraw amount
-        try{
-            Business.validWithdraw(accountID,amount);
+        while(true){
+            System.out.println(clearScreen);
+            System.out.println(
+                            "///////////////\n" +
+                            "/// Withdraw ///\n" +
+                            "///////////////");
+            System.out.print("$");
+            String input = s.nextLine();
+            try{
+                double amount = Double.parseDouble(input);
+                try{
+                    //Business Layer - Call a  func to validate withdraw amount
+                    Business.validWithdraw(accountID,amount);
+                    System.out.println(clearScreen);
+                    System.out.println("$"+ amount + " has been successfully withdrawn from your account.");
+                }
+                catch (InsufficientFundsException | NegativeInputException | MoreThanTwoDecimalPlacesException e){
+                    System.out.println(clearScreen);
+                    System.out.println("Withdrawal failed due to: " + e);
+                }
+            }
+            catch (NumberFormatException e){
+                if(input.equals("q")) {
+                    System.out.println(clearScreen);
+                    break;
+                }
+                System.out.println(clearScreen);
+                System.out.println("Please enter a valid numeric value (Decimals are valid)");
+            }
         }
-        catch (InsufficientFundsException e){
-            System.out.println("Withdrawal failed due to: " + e);
-        }
-        System.out.println("$"+ amount + " has been successfully withdrawn from your account.");
+
+
+
     }
     // Ye
     private void transfer() {
