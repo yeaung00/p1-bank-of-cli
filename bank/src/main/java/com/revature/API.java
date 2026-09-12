@@ -2,9 +2,9 @@ package com.revature;
 
 import java.util.*;
 
-import com.revature.Exceptions.NegativeInputException;
-import com.revature.Exceptions.MoreThanTwoDecimalPlacesException;
-import com.revature.Exceptions.InvalidCredentialsException;
+import com.revature.exceptions.*;
+import com.revature.exceptions.customexceptions.*;
+
 import java.util.concurrent.TimeUnit;
 
 public class API {
@@ -87,8 +87,10 @@ public class API {
             System.out.println("Login Successful!");
             homeAccountPage(accountID);
             return true;
-
-        } catch (Exception e) {
+        
+    // I can catch now a general business exception without needing to know 
+    // exactly which one the business layer will throw
+        } catch (BusinessException e) {
             System.out.println("Error: " + e);
             return false;
         }
@@ -228,7 +230,7 @@ public class API {
         try{
             String res = Business.validateTransactionHistory(accountID);
             System.out.println(res);
-        } catch(Exception e) {
+        } catch(BusinessException e) {
             System.out.println("Error:" + e);
         }
     }
