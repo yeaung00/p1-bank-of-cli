@@ -1,6 +1,6 @@
 package com.revature.exceptions;
 
-public class BusinessException extends BankException {
+public abstract class BusinessException extends BankException {
     public BusinessException(String message) {
         super(message);
     }
