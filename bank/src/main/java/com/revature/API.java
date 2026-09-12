@@ -2,15 +2,21 @@ package com.revature;
 
 import java.util.*;
 
+import com.revature.Exceptions.NegativeInputException;
+import com.revature.Exceptions.MoreThanTwoDecimalPlacesException;
+import com.revature.Exceptions.InvalidCredentialsException;
+import java.util.concurrent.TimeUnit;
+
 public class API {
     // Attributes
     private Scanner s;
     private String accountID;
     private String pin;
     private HashMap mockDB;
-    double amount;
     // temporary data storage for transactions
     private ArrayList<String> transactionHistory = new ArrayList<>();
+
+    private static String clearScreen = "\033[2J";
 
     // Constructors
 
@@ -31,15 +37,9 @@ public class API {
 
             // Login = 'l'
             if (command.equals("l")) {
-                // Prompt the user for their account ID and PIN
-                System.out.print("Welcome to the login screen. Please provide your Account ID: ");
-                String accountID = s.nextLine();
-                System.out.print("\nPlease provide your PIN: ");
-                String pin = s.nextLine();
-
                 // Call login to determine if the login was successful
                 //if login was unsuccessful, then reprompt login screen
-                if (login(accountID, pin)) {
+                if (login()) {
                     break;
                 }
 
@@ -79,18 +79,17 @@ public class API {
     // Yousef
     //for now Business.verifyCredentials() is unimplemented until we work on business layer
     //returns whether or not login was successful
-    private boolean login(String accountID, String pin) {
+    private boolean login() {
         try {
-            //adding first clause for testing
-            if(accountID.equals("Billy") && Business.verifyCredentials(accountID, pin)) {
-                System.out.println("Login Successful!");
-                homeAccountPage(accountID);
-                return true;
-            }
-            else {
-                System.out.println("Username or password is incorrect, please try again");
-                return false;
-            }
+            System.out.print("Welcome to the login screen. Please provide your Account ID: ");
+            String accountID = s.nextLine();
+            System.out.print("\nPlease provide your PIN: ");
+            String pin = s.nextLine();
+            Business.verifyCredentials(accountID, pin);
+            System.out.println("Login Successful!");
+            homeAccountPage(accountID);
+            return true;
+
         } catch (Exception e) {
             System.out.println("Error: " + e);
             return false;
@@ -163,32 +162,59 @@ public class API {
     }
 
     private void deposit() {
-        System.out.print("Please input how much you'd like to deposit: $");
-        // This procedure helps avoid reading in the left-over newline character
-        amount = Double.parseDouble(s.nextLine());
+        // Print statement that clears the terminal (depends on which one you're on though; we might need to test this more).
+        System.out.print(clearScreen);
+        System.out.println(
+            "///////////////\n" +
+            "/// Deposit ///\n" +
+            "///////////////");
+        System.out.println("Please input how much you'd like to deposit. Press 'q' to return to the main menu.");
+        while (true) {
+            System.out.print("$");
+            String input = s.nextLine();
+            try {
+                double amount = Double.parseDouble(input);
+                if (Business.validDeposit(accountID, amount)) {
+                    System.out.print("You've deposited $" + amount + ". Thank you!\nRedirecting to home screen...\n");
 
-        // Business layer - Call a function that will check whether the deposit is valid.
-
-        System.out.print("You've deposited $" + amount + ". Thank you!\nReturning to menu...\n");
+                    // Wait 3 seconds to clear the terminal and redirect to home screen
+                    try {
+                        TimeUnit.SECONDS.sleep(4);
+                        System.out.print(clearScreen);
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                    }
+                    break;
+                }
+                // Would need to move this somewhere later
+                System.out.println("Deposit failed! Please try again.");
+            } catch (NumberFormatException e) {
+                if (input.equals("q")) {
+                    System.out.print(clearScreen);
+                    break;
+                } else {
+                    System.out.println("Invalid input. Please try again.");
+                }
+            } catch (NegativeInputException e) {
+                System.out.println(e.getMessage() + "Please try again.");
+            } catch (MoreThanTwoDecimalPlacesException e) {
+                System.out.println(e.getMessage() + "Please try again.");
+            }
+        }
     }
 
     private void withdraw() {
         System.out.println("Please input how much you would like to withdraw");
-        amount = Double.parseDouble(s.nextLine());
+        double amount = Double.parseDouble(s.nextLine());
         //Business Layer - Calla  func to validate withdraw amount
-        if(Business.validWithdraw("Billy",amount)){
-            System.out.println("$"+ amount + " has been successfully withdrawn from your account.");
-        } else {
-            System.out.println("Invalid amount ,please try again.");
-        }
+        System.out.println("$"+ amount + " has been successfully withdrawn from your account.");
     }
-
     // Ye
     private void transfer() {
         System.out.println("Please input the account ID you'd like to transfer to.");
         String  toId = s.nextLine();
         System.out.println("Please input transfer amount.");
-        amount = Double.parseDouble(s.nextLine());
+        double amount = Double.parseDouble(s.nextLine());
         // Business Layer validates transaction
         // Business.transfer(fromId, toId, amount)
         System.out.println("You've transferred $" + amount + " to " + toId + ".");
