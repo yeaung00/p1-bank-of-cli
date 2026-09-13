@@ -213,15 +213,23 @@ public class API {
     // Ye
     private void transfer() {
         System.out.println("Please input the account ID you'd like to transfer to.");
-        String toId = s.nextLine();
+        String toID = s.nextLine();
         System.out.println("Please input transfer amount.");
-        double amount = Double.parseDouble(s.nextLine());
+
         // Business Layer validates transaction
-        // Business.transfer(this.accountID, toID, amount)
+        try {
+            double amount = Double.parseDouble(s.nextLine());
+            boolean isValidTransfer = Business.validTransfer(this.accountID, toID, amount);
+            if (isValidTransfer) {
+                System.out.println("You've transferred $" + amount + " to " + toID + ".");
+            }
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
 
         // Business Layer tracks transfer into transaction activity
         // Business.postTransferTransaction(this.accountID, transactionType, toID, amount)
-        System.out.println("You've transferred $" + amount + " to " + toId + ".");
+
     }
 
     //yousef
