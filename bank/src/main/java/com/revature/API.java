@@ -2,12 +2,19 @@ package com.revature;
 
 import java.util.*;
 
+import com.revature.Exceptions.NegativeInputException;
+import com.revature.Exceptions.MoreThanTwoDecimalPlacesException;
+import com.revature.Exceptions.InvalidCredentialsException;
+import java.util.concurrent.TimeUnit;
+
 public class API {
     // Attributes
     private Scanner s;
     private String accountID;
     private String pin;
     private HashMap mockDB;
+
+    private static String clearScreen = "\033[2J";
 
     // Constructors
 
@@ -28,17 +35,11 @@ public class API {
 
             // Login = 'l'
             if (command.equals("l")) {
-                // Prompt the user for their account ID and PIN
-                System.out.print("Welcome to the login screen. Please provide your Account ID: ");
-                String accountID = s.nextLine();
-                System.out.print("\nPlease provide your PIN: ");
-                String pin = s.nextLine();
-
                 // Call login to determine if the login was successful
-                login(accountID, pin);
-
-                // Leads to the application quitting
-                break;
+                //if login was unsuccessful, then reprompt login screen
+                if (login()) {
+                    break;
+                }
 
             // Register = 'r'
             } else if (command.equals("r")) {
@@ -74,18 +75,22 @@ public class API {
     }
 
     // Yousef
-    // Class is private because method should only be accessed within class (API) and not outside
-    private void login(String accountID, String pin) {
+    //for now Business.verifyCredentials() is unimplemented until we work on business layer
+    //returns whether or not login was successful
+    private boolean login() {
         try {
-            if(Business.verifyCredentials(accountID, pin)) {
-                System.out.println("Login Successful!");
-                homeAccountPage(accountID);
-            }
-            else {
-                System.out.println("Username or password is incorrect, please try again");
-            }
+            System.out.print("Welcome to the login screen. Please provide your Account ID: ");
+            String accountID = s.nextLine();
+            System.out.print("\nPlease provide your PIN: ");
+            String pin = s.nextLine();
+            Business.verifyCredentials(accountID, pin);
+            System.out.println("Login Successful!");
+            homeAccountPage(accountID);
+            return true;
+
         } catch (Exception e) {
             System.out.println("Error: " + e);
+            return false;
         }
     }
 
@@ -133,7 +138,7 @@ public class API {
                     break;
                 case "v":
                     // same thing here
-                    viewActivity();
+                    transactionHistory(accountID);
                     break;
                 case "q":
                     // same thing here
@@ -147,13 +152,63 @@ public class API {
     }
 
     // First come first serve for these 5
+
+    // viewBalance: Displays the current balance of the account
     private void viewBalance() {
+        // This method will call the business layer to get the balance of the account
+//        System.out.println("Your current balance is: [insert value here]");
+
+        // dummy business call
+        Business.viewBalance(this.accountID);
     }
 
     private void deposit() {
+        // Print statement that clears the terminal (depends on which one you're on though; we might need to test this more).
+        System.out.print(clearScreen);
+        System.out.println(
+            "///////////////\n" +
+            "/// Deposit ///\n" +
+            "///////////////");
+        System.out.println("Please input how much you'd like to deposit. Press 'q' to return to the main menu.");
+        while (true) {
+            System.out.print("$");
+            String input = s.nextLine();
+            try {
+                double amount = Double.parseDouble(input);
+                if (Business.validDeposit(accountID, amount)) {
+                    System.out.print("You've deposited $" + amount + ". Thank you!\nRedirecting to home screen...\n");
+
+                    // Wait 3 seconds to clear the terminal and redirect to home screen
+                    try {
+                        TimeUnit.SECONDS.sleep(4);
+                        System.out.print(clearScreen);
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                    }
+                    break;
+                }
+                // Would need to move this somewhere later
+                System.out.println("Deposit failed! Please try again.");
+            } catch (NumberFormatException e) {
+                if (input.equals("q")) {
+                    System.out.print(clearScreen);
+                    break;
+                } else {
+                    System.out.println("Invalid input. Please try again.");
+                }
+            } catch (NegativeInputException e) {
+                System.out.println(e.getMessage() + "Please try again.");
+            } catch (MoreThanTwoDecimalPlacesException e) {
+                System.out.println(e.getMessage() + "Please try again.");
+            }
+        }
     }
 
     private void withdraw() {
+        System.out.println("Please input how much you would like to withdraw");
+        double amount = Double.parseDouble(s.nextLine());
+        //Business Layer - Calla  func to validate withdraw amount
+        System.out.println("$"+ amount + " has been successfully withdrawn from your account.");
     }
     // Ye
     private void transfer() {
@@ -169,7 +224,16 @@ public class API {
         System.out.println("You've transferred $" + amount + " to " + toId + ".");
     }
 
-    private void viewActivity() {
+    //yousef
+    // displays transaction activity from db
+    private void transactionHistory(String accountID) {
+        //temporarily adding info into transaction history
+        try{
+            String res = Business.validateTransactionHistory(accountID);
+            System.out.println(res);
+        } catch(Exception e) {
+            System.out.println("Error:" + e);
+        }
     }
 
     // Main
