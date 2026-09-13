@@ -13,7 +13,7 @@
         <maven.compiler.target>21</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <!-- custom property to ensure that all JUnit dependencies are the same version -->
-        <junit-version>6.1.3</junit-version>
+        <junit-version>5.13.4</junit-version>
         <mockito-version>5.23.0</mockito-version>
     </properties>
 
@@ -41,18 +41,10 @@
             <!--
                 Dependencies for testing
             -->
-            <!-- Source: https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-api -->
+            <!-- Source: https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter -->
             <dependency>
                 <groupId>org.junit.jupiter</groupId>
-                <artifactId>junit-jupiter-api</artifactId>
-                <version>${junit-version}</version>
-                <scope>test</scope>
-            </dependency>
-
-            <!-- Source: https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-engine -->
-            <dependency>
-                <groupId>org.junit.jupiter</groupId>
-                <artifactId>junit-jupiter-engine</artifactId>
+                <artifactId>junit-jupiter</artifactId>
                 <version>${junit-version}</version>
                 <scope>test</scope>
             </dependency>
@@ -74,13 +66,19 @@
             </dependency>
         </dependencies>
 
-        <!-- allows for the generation of a maven wrapper file to manually control maven -->
         <build>
             <plugins>
+                <!-- allows for the generation of a maven wrapper file to manually control maven -->
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-wrapper-plugin</artifactId>
                     <version>3.3.4</version>
+                </plugin>
+                <!-- Runs JUnit 5 tests during the Maven test phase. -->
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <version>3.2.5</version>
                 </plugin>
             </plugins>
         </build>
