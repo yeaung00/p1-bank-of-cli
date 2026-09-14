@@ -1,37 +1,37 @@
 package com.revature;
 
 public class Repository {
-    // Adds a new account after a user registers
+    // Adds a new account after a user registers - Ydur
     public static void addAccount() {
 
     }
 
-    // Gets the accountID and PIN to verify the credentials when logging in
+    // Gets the accountID and PIN to verify the credentials when logging in - Yousef
     public static Account getAccount() {
 
     }
 
-    // Might not even need this
+    // Might not even need this - Yousef
     private static void getBalance() {
 
     }
 
-    // Updates the value of balance during deposits, withdraws, and transfers
-    public static void updateBalance(double amount) {
+    // (updateBalance) Updates the value of balance during deposits and withdraws - Connor
+    public static void updateBalance(String accountID, double amount) {
 
     }
 
-    // Perform manualCommitConnect() and facilitate a transfer
+    // Perform manualCommitConnect() and facilitate a transfer - Ye
     public static void transfer(String accountFrom, String accountTo, double amount) {
 
     }
 
-    // Adds a transaction for an associated accountID
+    // Adds a transaction for an associated accountID - Ye
     public static void addTransaction() {
 
     }
 
-    // Retrieves the tranactions for an associated accountID
+    // Retrieves the tranactions for an associated accountID - Yousef
     public static void viewTransactionHistory() {
 
     }
