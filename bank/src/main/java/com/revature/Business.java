@@ -2,6 +2,7 @@ package com.revature;
 
 import com.revature.exceptions.*;
 import com.revature.exceptions.customexceptions.*;
+import java.sql.SQLException;
 
 import java.math.BigDecimal;
 
@@ -44,17 +45,18 @@ public class Business {
     }
     
     // Checks if the deposit is valid (Is the amount positive?) - Connor
-    public static boolean validDeposit(String accountID, double amount) throws NegativeInputException, MoreThanTwoDecimalPlacesException {
+    public static boolean validDeposit(String accountID, double amount) throws BusinessException, RepositoryException {
         // If the amount is negataive, it is not a valid deposit
         if (amount < 0) {
-            throw new NegativeInputException("You cannot input a negative amount to deposit. ");
+            throw new NegativeInputException("You cannot input a negative amount to deposit. Please try again");
         } else if (!hasAtMostTwoDecimalPlaces(amount)) {
-            throw new MoreThanTwoDecimalPlacesException("The amount cannot have more than two decimal places. ");
+            throw new MoreThanTwoDecimalPlacesException("The amount cannot have more than two decimal places. Please try again.");
         }
 
         // Send a request to the repo layer to update the balance to total
         double total = viewBalance(accountID) + amount;
-        System.out.println("This would send the deposit request to the Repo layer...");
+        Repository.updateBalance(accountID, total);
+        System.out.println("This is where the Account object would update the balance");
 
         // Return true if everything above succeeds
         return true;
