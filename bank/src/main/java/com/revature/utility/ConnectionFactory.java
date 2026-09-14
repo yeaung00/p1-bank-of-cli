@@ -6,6 +6,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 public class ConnectionFactory {
+    // FYI: the BANK_DATABASE_PATH should point to bank/data/bank.db
     public static final String DATABASE_PATH = System.getenv("BANK_DATABASE_PATH");
     public static final String URL = "jdbc:sqlite:" + DATABASE_PATH;
 
