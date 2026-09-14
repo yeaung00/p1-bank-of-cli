@@ -6,13 +6,13 @@ public class Repository {
 
     }
 
-
-    public static void getAccount() {
+    // Gets the accountID and PIN to verify the credentials when logging in
+    public static Account getAccount() {
 
     }
 
-    // Run one time once the user logs in
-    public static void getBalance() {
+    // Might not even need this
+    private static void getBalance() {
 
     }
 
@@ -26,7 +26,7 @@ public class Repository {
 
     }
 
-    // Adds a transaction associated for an associated accountID
+    // Adds a transaction for an associated accountID
     public static void addTransaction() {
 
     }
