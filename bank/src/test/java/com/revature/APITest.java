@@ -3,7 +3,7 @@ import org.junit.jupiter.api.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 //we will create mock db using mockito
-import static org.mockito.Mockito.*;
+import org.mockito.Mockito;
 
 //NOTE: this is just introducing JUnit testing. 
 // DO NOT add any more test files

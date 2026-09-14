@@ -79,7 +79,7 @@ public class Business {
     // Checks if the withdrawal is valid (Do they have enough? Is the amount positive?) - Ydur
     public static boolean validWithdraw(String accountID, double amount) throws InsufficientFundsException, NegativeInputException,MoreThanTwoDecimalPlacesException {
         //If amount is more than in the account, a negative number,a non number , has too many decimal places,throw error
-        if(amount > Business.viewBalance(accountID)) {
+        if(amount > viewBalance(accountID)) {
             throw new InsufficientFundsException("The amount withdrawn cannot be more than the account balance.");
         }else if(amount < 0){
             throw new NegativeInputException("Unable to withdraw a negative amount.");

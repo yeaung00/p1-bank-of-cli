@@ -3,6 +3,9 @@ package com.revature;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.PreparedStatement;
+
+import com.revature.utility.ConnectionFactory;
 
 public class Repository {
     // Adds a new account after a user registers - Ydur
@@ -22,7 +25,6 @@ public class Repository {
 
     // (updateBalance) Updates the value of balance during deposits and withdraws - Connor
     public static void updateBalance(String accountID, double amount) throws SQLException {
-        /*
         String sqlQuery = "UPDATE accounts SET balance = ? where accountID = ?";
         try (
             Connection connection = ConnectionFactory.getAutoCommitConnect();
@@ -35,7 +37,6 @@ public class Repository {
                 throw new SQLException("Deposit failed.");
             }
         }
-        */
     }
 
     // Perform manualCommitConnect() and facilitate a transfer - Ye
