@@ -28,28 +28,26 @@ public class DatabaseInitializer {
         Connection conn = ConnectionFactory.getAutoCommitConnect();
 
         Statement stmt = conn.createStatement();
-        String tableSQL = "CREATE TABLE IF NOT EXISTS accounts (\n" +
-                "    account_id TEXT PRIMARY KEY,\n" +
-                "    pin_hash TEXT NOT NULL,\n" +
-                "    balance_cents INTEGER NOT NULL DEFAULT 0 CHECK (balance_cents >= 0),\n" +
-                "    creationDate TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP\n" +
-                ");\n" +
-                "\n" +
-                "CREATE TABLE IF NOT EXISTS transactions (\n" +
-                "    transaction_id INTEGER PRIMARY KEY AUTOINCREMENT,\n" +
-                "    account_id TEXT NOT NULL,\n" +
-                "    transaction_type TEXT NOT NULL CHECK (\n" +
-                "        transaction_type IN ('DEPOSIT', 'WITHDRAWAL', 'TRANSFER_IN', 'TRANSFER_OUT')\n" +
-                "    ),\n" +
-                "    amount_cents INTEGER NOT NULL CHECK (amount_cents > 0),\n" +
-                "    related_account_id TEXT,\n" +
-                "    creationDate TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,\n" +
-                "    FOREIGN KEY (account_id) REFERENCES accounts(account_id)\n" +
-                ");\n" +
-                "\n" +
-                "CREATE INDEX IF NOT EXISTS idx_transactions_account_id\n" +
-                "    ON transactions(account_id);";
-        stmt.execute(tableSQL);
+        String accountTableSQL = "CREATE TABLE IF NOT EXISTS accounts (" +
+                "account_id TEXT PRIMARY KEY," +
+                "pin_hash TEXT NOT NULL," +
+                "balance_cents INTEGER NOT NULL DEFAULT 0 CHECK (balance_cents >= 0)," +
+                "creationDate TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP" +
+                ");";
+        String transactionTableSQL =
+                "CREATE TABLE IF NOT EXISTS transactions (" +
+                "transaction_id INTEGER PRIMARY KEY AUTOINCREMENT," +
+                "account_id TEXT NOT NULL," +
+                "transaction_type TEXT NOT NULL CHECK (" +
+                "transaction_type IN ('DEPOSIT', 'WITHDRAWAL', 'TRANSFER_IN', 'TRANSFER_OUT')" +
+                ")," +
+                "amount_cents INTEGER NOT NULL CHECK (amount_cents > 0)," +
+                "related_account_id TEXT," +
+                "creationDate TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP," +
+                "FOREIGN KEY (account_id) REFERENCES accounts(account_id)" +
+                ");";
+        stmt.execute(accountTableSQL);
+        stmt.execute(transactionTableSQL);
     }
 
     // would create a data folder at the root directory (bank) if it does not exist to ensure

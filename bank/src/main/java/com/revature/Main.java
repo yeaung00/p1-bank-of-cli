@@ -8,9 +8,8 @@ import java.sql.SQLException;
 public class Main {
     public static void main(String[] args) {
         // possibly change based on where we want to handle the exceptions
-        DatabaseInitializer db = new DatabaseInitializer();
         try {
-            db.initialize();
+            DatabaseInitializer.initialize();
         } catch (SQLException e) {
             throw new RuntimeException("Failed to create tables", e);
         } catch (IOException e) {

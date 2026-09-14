@@ -7,8 +7,8 @@ import java.sql.Statement;
 
 public class ConnectionFactory {
     // FYI: the BANK_DATABASE_PATH should point to bank/data/bank.db
-    public static final String DATABASE_PATH = System.getenv("BANK_DATABASE_PATH");
-    public static final String URL = "jdbc:sqlite:" + DATABASE_PATH;
+    public static final String DATABASE_URL = System.getenv("BANK_DATABASE_PATH");
+    public static final String URL = "jdbc:sqlite:" + DATABASE_URL;
 
     // avoiding handling the error here and propagating it back up
     public static Connection getAutoCommitConnect() throws SQLException {
@@ -35,7 +35,7 @@ public class ConnectionFactory {
 
     // checks that the user properly configured the BANK_DATABASE_PATH environment variable
     public static void checkDatabasePath() {
-        if (DATABASE_PATH == null || DATABASE_PATH.isBlank()) {
+        if (URL == null || URL.isBlank()) {
             throw new IllegalStateException(
                     "BANK_DATABASE_PATH environment variable is not configured"
             );
