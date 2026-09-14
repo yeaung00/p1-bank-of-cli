@@ -10,17 +10,26 @@ public class ConnectionFactory {
     public static final String URL = "jdbc:sqlite:" + DATABASE_PATH;
 
     // avoiding handling the error here and propagating it back up
-    public static Connection getConnection() throws SQLException {
+    public static Connection getAutoCommitConnect() throws SQLException {
         checkDatabasePath();
+        Connection connection = DriverManager.getConnection(URL);
+        connection.setAutoCommit(true);
+        return connection;
+    }
 
-        Connection conn = DriverManager.getConnection(URL);
+    public static Connection getManualCommitConnection() throws SQLException {
+        checkDatabasePath();
+        Connection connection = DriverManager.getConnection(URL);
+        connection.setAutoCommit(false);
+        configureForeignKeyEnforcement(connection);
+        return connection;
+    }
 
-        try (Statement statement = conn.createStatement()) {
-            // turns on foreign key constraints
-            statement.execute("PRAGMA foreign_keys = ON");
+    public static void configureForeignKeyEnforcement(Connection connection) throws SQLException {
+        try (Statement statement = connection.createStatement()) {
+            String sql = "PRAGMA foreign_keys = true";
+            statement.execute(sql);
         }
-
-        return conn;
     }
 
     // checks that the user properly configured the BANK_DATABASE_PATH environment variable
