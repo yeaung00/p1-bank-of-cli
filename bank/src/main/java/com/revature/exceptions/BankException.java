@@ -1,4 +1,4 @@
-package com.revature.Exceptions;
+package com.revature.exceptions;
 
 public abstract class BankException extends Exception{
     public BankException(String message) {
