@@ -20,8 +20,8 @@ public class DatabaseInitializer {
      */
 
     public static void initialize() throws SQLException, IOException {
-        createTables();
         createDirectories();
+        createTables();
     }
 
     private static void createTables() throws SQLException {
@@ -53,11 +53,7 @@ public class DatabaseInitializer {
     // would create a data folder at the root directory (bank) if it does not exist to ensure
     // the database path would be correct?
     private static void createDirectories() throws IOException {
-        // this gets the path to DatabaseInitializer.java
-        Path workingDir = Paths.get("").toAbsolutePath();
-        // this gets the path to the bank directory
-        Path projectRoot = workingDir.resolve("bank");
-        // this attempts to check if data is available
+        Path projectRoot = Paths.get("").toAbsolutePath();
         Path dataDir = projectRoot.resolve("data");
 
         Files.createDirectories(dataDir);
