@@ -7,7 +7,7 @@ public class Repository {
     }
 
     // Gets the accountID and PIN to verify the credentials when logging in - Yousef
-    public static Account getAccount() {
+    public static void getAccount() {
 
     }
 
