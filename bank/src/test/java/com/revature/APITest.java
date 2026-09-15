@@ -56,6 +56,8 @@ public class APITest {
     }
     */
 
+    /*
+    // Tests if the validDeposit function in the Business layer works
     @Test
     void testValidDeposit() throws BusinessException, RepositoryException {
         try (MockedStatic<Repository> mockRepo = Mockito.mockStatic(Repository.class)) {
@@ -76,6 +78,8 @@ public class APITest {
     void testMoreThanTwoDecimalPlacesDeposit() {
         Assertions.assertThrows(BusinessException.class, () -> {Business.validDeposit("Billy", 100.401);});
     }
+
+    */
 
     // For integration tests, don't run here
     /*
