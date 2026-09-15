@@ -1,14 +1,14 @@
 package com.revature;
 
 public class Account {
-    private int accountId;
+    private String accountId;
     private String pin;
     private double balance;
     private String creationDate;
 
-    public Account(int accountId, String pin, double balance, String creationDate) {
+    public Account(String accountId, String pin, double balance, String creationDate) {
         // redundant check that arguments are valid
-        if (accountId <= 0) {
+        if (accountId == null || accountId.isBlank()) {
             throw new IllegalArgumentException(
                     "Account ID cannot be zero or negative"
             );
@@ -32,15 +32,15 @@ public class Account {
         this.creationDate = creationDate;
     }
 
-    public Account(int accountId, String pin) {
+    public Account(String accountId, String pin) {
         this(accountId, pin, 0.0, null);
     }
 
-    public int getAccountId() {
+    public String getAccountId() {
         return accountId;
     }
 
-    public void setAccountId(int accountId) {
+    public void setAccountId(String accountId) {
         this.accountId = accountId;
     }
 
