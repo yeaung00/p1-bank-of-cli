@@ -6,6 +6,8 @@ import com.revature.exceptions.customexceptions.*;
 import java.math.BigDecimal;
 
 public class Business {
+    public static Account a;
+
     // Ydur
     public static boolean verifyRegistration(String accountID) {
         return true;
@@ -20,6 +22,7 @@ public class Business {
 
         // When testing, login with accoundID "Billy" and Pin "4"
         if(accountID.equals("Billy") && pin.equals("4")){
+            a = new Account("Billy", "4");
             return true;
         }
         else {
@@ -34,13 +37,12 @@ public class Business {
     public static double viewBalance(String accountID) {
         // assuming that there will be a database connection to retrieve the balance for the given accountID
         // for now, we will just print a mock balance
-        double balance = 1000.00; // Mock balance for now
         /*
             Generally, how it will look with a database connection:
             double balance = database.getBalance(accountID);
             System.out.println("Your current balance is: $" + balance);
          */
-        return balance;
+        return a.getBalance();
     }
     
     // Checks if the deposit is valid (Is the amount positive?) - Connor
@@ -55,8 +57,10 @@ public class Business {
         // Send a request to the repo layer to update the balance to total
         double total = viewBalance(accountID) + amount;
         System.out.println("This would send the deposit request to the Repo layer...");
+        a.setBalance(total);
 
-        // Return true if everything above succeeds
+        // Update the account's balance and return true if everything succeeded.
+        a.setBalance(total);
         return true;
     }
 
@@ -77,7 +81,7 @@ public class Business {
     }
 
     // Checks if the withdrawal is valid (Do they have enough? Is the amount positive?) - Ydur
-    public static boolean validWithdraw(String accountID, double amount) throws InsufficientFundsException, NegativeInputException,MoreThanTwoDecimalPlacesException {
+    public static boolean validWithdraw(String accountID, double amount) throws InsufficientFundsException, NegativeInputException, MoreThanTwoDecimalPlacesException {
         //If amount is more than in the account, a negative number,a non number , has too many decimal places,throw error
         if(amount > Business.viewBalance(accountID)) {
             throw new InsufficientFundsException("The amount withdrawn cannot be more than the account balance.");
@@ -87,11 +91,31 @@ public class Business {
         else if(!hasAtMostTwoDecimalPlaces(amount)){
             throw new MoreThanTwoDecimalPlacesException("There were too many decimal places provided.");
         }
+
+        double total = viewBalance(accountID) - amount;
+        System.out.println("This would send the withdrawl request to the Repo layer...");
+
+        // Update the account's balance and return true if everything succeeded.
+        a.setBalance(total);
         return true;
     }
 
     // Checks if the transfer is valid (Does the other person have enough? Do you? Is the amount positive?) - Ye
-    public static boolean validTransfer(String accountIDFrom, String accountIDTo, double amount) {
+    public static boolean validTransfer(String accountIDFrom, String accountIDTo, double amount) throws InsufficientFundsException, NegativeInputException, MoreThanTwoDecimalPlacesException {
+        if (amount > Business.viewBalance(accountIDFrom)) {
+            throw new InsufficientFundsException("The amount withdrawn cannot be more than the account balance.");
+        } else if (amount < 0){
+            throw new NegativeInputException("Unable to withdraw a negative amount.");
+        } else if (!hasAtMostTwoDecimalPlaces(amount)){
+            throw new MoreThanTwoDecimalPlacesException("There were too many decimal places provided.");
+        }
+
+        double totalFrom = viewBalance(accountIDFrom) - amount;
+        double totalTo = viewBalance(accountIDTo) + amount;
+        System.out.println("This would send the ATOMIC TRANSFER to the repo layer...");
+
+        // Update the current account's balance and return true if everything succeeded.
+        a.setBalance(totalFrom);
         return true;
     }
 
