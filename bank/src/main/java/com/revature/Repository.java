@@ -1,5 +1,13 @@
 package com.revature;
 
+import com.revature.exceptions.RepositoryException;
+import com.revature.utility.ConnectionFactory;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
 public class Repository {
     // Adds a new account after a user registers - Ydur
     public static void addAccount() {
@@ -12,8 +20,32 @@ public class Repository {
     }
 
     // Might not even need this - Yousef
-    private static void getBalance() {
+    public static double getBalance(String accountID) throws AccountNotFoundException, DatabaseException {
+        // assuming that accountID is unique
+        String query = "SELECT balance_cents" +
+                        "FROM accounts " +
+                        "WHERE account_id = ?";
 
+        try (
+                Connection conn = ConnectionFactory.getAutoCommitConnect();
+                PreparedStatement ps = conn.prepareStatement(query)
+        ) {
+            ps.setString(1, accountID);
+
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                // process the result
+                return rs.getInt("balance_cents") / 100.0;
+            } else {
+                // TODO: similarly to what Yousef specified: this is where the logging would be
+
+                // assuming the AccountNotFoundException is implemented
+                throw new AccountNotFoundException("Account not found: " + accountID);
+            }
+        } catch (SQLException e) {
+            // assuming the DatabaseException is implemented
+            throw new DatabaseException("Error occurred while fetching account balance", e);
+        }
     }
 
     // (updateBalance) Updates the value of balance during deposits and withdraws - Connor

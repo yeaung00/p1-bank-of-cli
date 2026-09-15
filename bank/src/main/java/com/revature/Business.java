@@ -3,6 +3,7 @@ package com.revature;
 import com.revature.exceptions.*;
 import com.revature.exceptions.customexceptions.*;
 
+import javax.security.auth.login.AccountNotFoundException;
 import java.math.BigDecimal;
 
 public class Business {
@@ -31,16 +32,23 @@ public class Business {
     }
 
     // Gets the balance from the Repository layer - Damon
-    public static double viewBalance(String accountID) {
-        // assuming that there will be a database connection to retrieve the balance for the given accountID
-        // for now, we will just print a mock balance
-        double balance = 1000.00; // Mock balance for now
-        /*
-            Generally, how it will look with a database connection:
-            double balance = database.getBalance(accountID);
-            System.out.println("Your current balance is: $" + balance);
-         */
-        return balance;
+    public static double viewBalance(String accountID) throws AccountNotFoundException, DatabaseException {
+        // interesting interaction that I'm not sure if it needs to be fixed
+        // viewBalance doesn't ever have to interact with an Account object:
+        // only ever querying the database and returning that value
+        try {
+            return Repository.getBalance(accountID);
+        } catch (RepositoryException e) {
+            if (e instanceof AccountNotFoundException) {
+                throw new InvalidCredentialsException("Invalid accountID", e);
+            }
+            if (e instanceof DatabaseException dbException) {
+                throw dbException;
+            }
+
+            // this return value can be changed for better logging/error purposes
+            return 0.0;
+        }
     }
     
     // Checks if the deposit is valid (Is the amount positive?) - Connor
