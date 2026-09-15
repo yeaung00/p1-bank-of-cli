@@ -6,6 +6,7 @@ import java.sql.SQLException;
 import java.sql.PreparedStatement;
 
 import com.revature.utility.ConnectionFactory;
+import com.revature.exceptions.RepositoryException;
 
 import com.revature.exceptions.*;
 import com.revature.exceptions.customexceptions.*;
@@ -19,11 +20,11 @@ public class Repository {
     // Gets the accountID and PIN to verify the credentials when logging in - Yousef
     public static Account getAccount(String AccountID, String pin) throws AccountNotFoundException, DatabaseException {
         String query = "select account_id, pin_hash " +
-                        "from accounts " + 
+                        "from accounts " +
                         "where account_id = ? " +
                         "and pin_hash = ?";
         String debugAccID = "select account_id " +
-                            "from accounts " + 
+                            "from accounts " +
                             "where account_id = ? " +
                             "";
         String debugPin = "select pin_hash " +
@@ -63,20 +64,44 @@ public class Repository {
                     }
                     else {
                         throw new AccountNotFoundException("No record contains the Account ID " + AccountID +
-                                                            " nor does any record contain the pin " + pin + 
+                                                            " nor does any record contain the pin " + pin +
                                                             " in the accounts table");
                     }
 
                 }
-            
+
         } catch(SQLException e) {
            throw new DatabaseException("Database error during Account retrieval: ", e);
         }
     }
 
     // Might not even need this - Yousef
-    private static void getBalance() {
+    public static double getBalance(String accountID) throws AccountNotFoundException, DatabaseException {
+        // assuming that accountID is unique
+        String query = "SELECT balance_cents" +
+                        "FROM accounts " +
+                        "WHERE account_id = ?";
 
+        try (
+                Connection conn = ConnectionFactory.getAutoCommitConnect();
+                PreparedStatement ps = conn.prepareStatement(query)
+        ) {
+            ps.setString(1, accountID);
+
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                // process the result
+                return rs.getInt("balance_cents") / 100.0;
+            } else {
+                // TODO: similarly to what Yousef specified: this is where the logging would be
+
+                // assuming the AccountNotFoundException is implemented
+                throw new AccountNotFoundException("Account not found: " + accountID);
+            }
+        } catch (SQLException e) {
+            // assuming the DatabaseException is implemented
+            throw new DatabaseException("Error occurred while fetching account balance", e);
+        }
     }
 
     // (updateBalance) Updates the value of balance during deposits and withdraws - Connor

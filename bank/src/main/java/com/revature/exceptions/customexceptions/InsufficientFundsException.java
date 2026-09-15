@@ -1,6 +1,8 @@
 package com.revature.exceptions.customexceptions;
 
-public class InsufficientFundsException extends Exception{
+import com.revature.exceptions.BusinessException;
+
+public class InsufficientFundsException extends BusinessException {
     public InsufficientFundsException(String message) {
         super(message);
     }
