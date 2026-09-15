@@ -50,12 +50,28 @@ public class DatabaseInitializer {
         stmt.execute(transactionTableSQL);
     }
 
-    // would create a data folder at the root directory (bank) if it does not exist to ensure
-    // the database path would be correct?
+    // would go down to the root directory of the project (p1-bank-of-cli) and check whether a data directory exists
+    // in the bank folder (p1-bank-of-cli/bank/data), creating one for the BANK_DATABASE_PATH to be valid
     private static void createDirectories() throws IOException {
-        Path projectRoot = Paths.get("").toAbsolutePath();
-        Path dataDir = projectRoot.resolve("data");
+        Path currentPath = Paths.get("").toAbsolutePath().normalize();
+        Path projectRoot = currentPath;
 
-        Files.createDirectories(dataDir);
+        // Search upward for the p1-bank-of-cli project directory
+        while (projectRoot != null
+                && !projectRoot.getFileName().toString().equals("p1-bank-of-cli")) {
+            projectRoot = projectRoot.getParent();
+        }
+
+        if (projectRoot == null) {
+            throw new IOException(
+                    "Could not find the p1-bank-of-cli project directory."
+            );
+        }
+
+        Path dataDirectory = projectRoot.resolve("bank").resolve("data");
+
+        // Creates bank and data if either does not exist.
+        // Does nothing if data already exists as a directory.
+        Files.createDirectories(dataDirectory);
     }
 }
