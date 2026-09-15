@@ -73,7 +73,5 @@ public class DatabaseInitializer {
         // Creates bank and data if either does not exist.
         // Does nothing if data already exists as a directory.
         Files.createDirectories(dataDirectory);
-
-        System.out.println("Database directory: " + dataDirectory);
     }
 }
