@@ -1,12 +1,14 @@
 package com.revature;
 
+import java.math.BigDecimal;
+
 public class Account {
     private String accountId;
     private String pin;
-    private double balance;
+    private BigDecimal balance;
     private String creationDate;
 
-    public Account(String accountId, String pin, double balance, String creationDate) {
+    public Account(String accountId, String pin, BigDecimal balance, String creationDate) {
         // redundant check that arguments are valid
         if (accountId == null || accountId.isBlank()) {
             throw new IllegalArgumentException(
@@ -20,7 +22,7 @@ public class Account {
             );
         }
 
-        if (balance < 0) {
+        if (balance.compareTo(BigDecimal.ZERO) < 0) {
             throw new IllegalArgumentException(
                     "Balance cannot be negative"
             );
@@ -33,7 +35,7 @@ public class Account {
     }
 
     public Account(String accountId, String pin) {
-        this(accountId, pin, 0.0, null);
+        this(accountId, pin, BigDecimal.ZERO, null);
     }
 
     public String getAccountId() {
@@ -60,13 +62,13 @@ public class Account {
         this.pin = pin;
     }
 
-    public double getBalance() {
+    public BigDecimal getBalance() {
         return balance;
     }
 
-    public void setBalance(double balance) {
+    public void setBalance(BigDecimal balance) {
         // redundant check if balance is valid
-        if (balance < 0) {
+        if (balance.compareTo(BigDecimal.ZERO) < 0) {
             throw new IllegalArgumentException("Balance cannot be negative");
         }
 
