@@ -8,7 +8,10 @@ import org.mockito.MockedStatic;
 
 import com.revature.exceptions.*;
 import com.revature.exceptions.customexceptions.*;
+import com.revature.utility.*;
 import java.sql.SQLException;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
 
 //NOTE: this is just introducing JUnit testing. 
 // DO NOT add any more test files
@@ -31,6 +34,28 @@ public class APITest {
         Assertions.assertNotNull(theAPI);
     }
 
+    // Integration - Don't run on this file.
+    /*
+    @Test
+    void createDummyInstance() throws SQLException {
+        String sqlQuery = "insert into accounts (account_id, pin_hash, balance_cents) values (?, ?, ?)";
+        try (
+            Connection connection = ConnectionFactory.getAutoCommitConnect();
+            PreparedStatement ps = connection.prepareStatement(sqlQuery);
+        ) {
+            ps.setString(1, "Billy");
+            ps.setString(2, "4");
+            ps.setInt(3, 10145);
+            int rowsAffected = ps.executeUpdate();
+            if (rowsAffected != 1) {
+                throw new SQLException();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+    */
+
     @Test
     void testValidDeposit() throws BusinessException, RepositoryException {
         try (MockedStatic<Repository> mockRepo = Mockito.mockStatic(Repository.class)) {
@@ -51,4 +76,24 @@ public class APITest {
     void testMoreThanTwoDecimalPlacesDeposit() {
         Assertions.assertThrows(BusinessException.class, () -> {Business.validDeposit("Billy", 100.401);});
     }
+
+    // For integration tests, don't run here
+    /*
+    @AfterEach 
+    void clearDummyInstance() {
+        String sqlQuery = "delete from accounts where account_id = ?";
+        try (
+            Connection connection = ConnectionFactory.getAutoCommitConnect();
+            PreparedStatement ps = connection.prepareStatement(sqlQuery);
+        ) {
+            ps.setString(1, "Billy");
+            int rowsAffected = ps.executeUpdate();
+            if (rowsAffected != 1) {
+                throw new SQLException();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+    */
 }
