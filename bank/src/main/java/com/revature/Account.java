@@ -8,7 +8,13 @@ public class Account {
     private double balance;
     private LocalDateTime creationDate;
 
-    public Account(String accountId, String pin) {
+    // This constructor will be used when creating a new account
+    public Account(String accoundId, String pin) {
+        this(accoundId, pin, 0.0);
+    }
+
+    // This constructor will be used when logging into an existing account
+    public Account(String accountId, String pin, double balance) {
         // redundant check that arguments are valid
         if (accountId == null || accountId.isBlank()) {
             throw new IllegalArgumentException(
@@ -24,7 +30,7 @@ public class Account {
 
         this.accountId = accountId;
         this.pin = pin;
-        this.balance = 0.0;
+        this.balance = balance;
         this.creationDate = LocalDateTime.now();
     }
 

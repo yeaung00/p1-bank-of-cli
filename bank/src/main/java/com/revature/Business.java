@@ -22,7 +22,7 @@ public class Business {
 
         // When testing, login with accoundID "Billy" and Pin "4"
         if(accountID.equals("Billy") && pin.equals("4")){
-            a = new Account("Billy", "4");
+            a = new Account(accountID, "4", viewBalance(accountID));
             return true;
         }
         else {
