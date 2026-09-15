@@ -1,4 +1,4 @@
-package com.revature.exceptions;
+package com.revature.exceptions.customexceptions;
 
 public class InsufficientFundsException extends Exception{
     public InsufficientFundsException(String message) {
