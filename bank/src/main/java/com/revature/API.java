@@ -90,10 +90,15 @@ public class API {
             homeAccountPage(accountID);
             return true;
         
-    // I can catch now a general business exception without needing to know 
+    // I can catch now a general bank exception without needing to know 
     // exactly which one the business layer will throw
-        } catch (BusinessException e) {
-            System.out.println("Error: " + e);
+        } catch (BankException e) {
+            // instead of printing to console, e will contain very sensitive information/ internal details
+            // so we must instead log this information into the logger
+            e.printStackTrace();
+            // two outcomes: either db failed to process request
+            // or Credentials given did not match any records in the db
+            // use .getMessage() to print the exception string
             return false;
         }
     }
@@ -198,10 +203,10 @@ public class API {
                 } else {
                     System.out.println("Invalid input. Please try again.");
                 }
-            } catch (NegativeInputException e) {
-                System.out.println(e.getMessage() + "Please try again.");
-            } catch (MoreThanTwoDecimalPlacesException e) {
-                System.out.println(e.getMessage() + "Please try again.");
+            } catch (BusinessException e) {
+                System.out.println(e.getMessage());
+            } catch (RepositoryException e) {
+                System.out.println(e.getMessage());
             }
         }
     }
