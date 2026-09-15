@@ -1,16 +1,18 @@
 package com.revature;
 
+import java.time.LocalDateTime;
+
 public class Account {
-    private int accountId;
+    private String accountId;
     private String pin;
     private double balance;
-    private String creationDate;
+    private LocalDateTime creationDate;
 
-    public Account(int accountId, String pin, double balance, String creationDate) {
+    public Account(String accountId, String pin) {
         // redundant check that arguments are valid
-        if (accountId <= 0) {
+        if (accountId == null || accountId.isBlank()) {
             throw new IllegalArgumentException(
-                    "Account ID cannot be zero or negative"
+                    "Account Id cannot be blank"
             );
         }
 
@@ -20,36 +22,22 @@ public class Account {
             );
         }
 
-        if (balance < 0) {
-            throw new IllegalArgumentException(
-                    "Balance cannot be negative"
-            );
-        }
-
         this.accountId = accountId;
         this.pin = pin;
-        this.balance = balance;
-        this.creationDate = creationDate;
+        this.balance = 0.0;
+        this.creationDate = LocalDateTime.now();
     }
 
-    public Account(int accountId, String pin) {
-        this(accountId, pin, 0.0, null);
-    }
-
-    public int getAccountId() {
+    public String getAccountId() {
         return accountId;
     }
 
-    public void setAccountId(int accountId) {
+    public void setAccountId(String accountId) {
         this.accountId = accountId;
     }
 
     public String getCreationDate() {
-        return creationDate;
-    }
-
-    public void setCreationDate(String creationDate) {
-        this.creationDate = creationDate;
+        return creationDate.toString();
     }
 
     public String getPin() {
