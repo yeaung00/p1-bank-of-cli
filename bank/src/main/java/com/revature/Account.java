@@ -10,13 +10,13 @@ public class Account {
         // redundant check that arguments are valid
         if (accountId == null || accountId.isBlank()) {
             throw new IllegalArgumentException(
-                    "Account ID cannot be zero or negative"
+                    "Account ID cannot be null or empty"
             );
         }
 
         if (pin == null || pin.isBlank()) {
             throw new IllegalArgumentException(
-                    "PIN cannot be blank"
+                    "PIN cannot be null or empty"
             );
         }
 
