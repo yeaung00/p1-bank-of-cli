@@ -11,6 +11,8 @@ import com.revature.exceptions.RepositoryException;
 import com.revature.exceptions.*;
 import com.revature.exceptions.customexceptions.*;
 
+import java.util.ArrayList;
+
 public class Repository {
     // Adds a new account after a user registers - Ydur
     public static void addAccount() {
@@ -134,7 +136,31 @@ public class Repository {
     }
 
     // Retrieves the tranactions for an associated accountID - Yousef
-    public static void viewTransactionHistory() {
-
+    public static ArrayList<Transaction> getTransactionHistory(String accountID) throws EmptyTransactionHistory, DatabaseException {
+        String query = "SELECT * FROM transactions t WHERE t.account_id = ?";
+        ArrayList<Transaction> out = new ArrayList<>();
+        try(   
+            Connection connection = ConnectionFactory.getAutoCommitConnect();
+            PreparedStatement statement = connection.prepareStatement(query);
+        ) {
+            statement.setString(1, accountID);
+            try (ResultSet res = statement.executeQuery()) {
+                while(res.next()) {
+                    String accID = res.getString("account_id");
+                    String tType = res.getString("transaction_type");
+                    int cents = res.getInt("amount_cents");
+                    String relID = res.getString("related_account_id");
+                    String cDate = res.getString("creationDate");
+                    // here I would create an account obj and pass in the retrieved record values as params
+                    // then add the obj to out
+                }
+                if(out.size() == 0) {
+                    throw new EmptyTransactionHistory("No transaction history found for account: " + accountID);
+                }
+                return out;
+            }
+        } catch (SQLException e) {
+            throw new DatabaseException("Database error during Transaction retrieval: ", e);
+        }
     }
 }

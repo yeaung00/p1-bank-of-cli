@@ -87,7 +87,7 @@ public class API {
             Business.verifyCredentials(accountID, pin);
             System.out.println(clearScreen);
             System.out.println("Login Successful!");
-            homeAccountPage(accountID);
+            homeAccountPage(accountID, pin);
             return true;
         
     // I can catch now a general bank exception without needing to know 
@@ -106,7 +106,7 @@ public class API {
     // This will be the query loop where it will ask you what you want to do:
     // view balance, deposit, withdraw, transfer, or view activity
     // Damon
-    private void homeAccountPage(String accountID) {
+    private void homeAccountPage(String accountID, String pin) {
         // Another query loop with those 5 tasks
         // would we want these messages to print each time you get to this page?
         // in that case, if you return from any of the actions, maybe we should move these into the while loop?
@@ -148,7 +148,7 @@ public class API {
                     break;
                 case "v":
                     // same thing here
-                    transactionHistory(accountID);
+                    transactionHistory(accountID, pin);
                     break;
                 case "q":
                     // same thing here
@@ -264,12 +264,14 @@ public class API {
 
     //yousef
     // displays transaction activity from db
-    private void transactionHistory(String accountID) {
+    private void transactionHistory(String accountID, String pin) {
         //temporarily adding info into transaction history
         try{
-            String res = Business.validateTransactionHistory(accountID);
-            System.out.println(res);
-        } catch(BusinessException e) {
+            ArrayList<Transaction> res = Business.validateTransactionHistory(accountID, pin);
+            if(res == null) {
+                System.out.println("history is empty");
+            }
+        } catch(BankException e) {
             System.out.println("Error:" + e);
         }
     }
