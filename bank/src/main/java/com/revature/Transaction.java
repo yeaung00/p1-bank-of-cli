@@ -1,5 +1,7 @@
 package com.revature;
 
+import java.math.BigDecimal;
+
 public class Transaction {
 
     //Initializing entity fields
@@ -7,12 +9,12 @@ public class Transaction {
     private String accountId;
     private String type;
     // Saving amount to double, subject to change based on Damon/Ye
-    private double amount;
+    private BigDecimal amount;
     private String relatedAccountId;
 
     //Constructor
 
-    public Transaction(String transactionId, String accountId, String type, double amount, String relatedAccountId) {
+    public Transaction(String transactionId, String accountId, String type, BigDecimal amount, String relatedAccountId) {
 
         if(transactionId == null || transactionId.isEmpty()){
             throw new IllegalArgumentException("Transaction ID cannot be empty.");
@@ -23,7 +25,7 @@ public class Transaction {
         if(type == null || type.isEmpty()){
             throw new IllegalArgumentException("Transaction must have a valid type.");
         }
-        if(amount < 0 ){
+        if(amount.compareTo(BigDecimal.ZERO) < 0 ){
             throw new IllegalArgumentException("Cannot transfer negative amount.");
         }
         if(relatedAccountId == null || relatedAccountId.isEmpty()){
@@ -64,11 +66,11 @@ public class Transaction {
         this.type = type;
     }
 
-    public double getAmount() {
+    public BigDecimal getAmount() {
         return amount;
     }
 
-    public void setAmount(double amount) {
+    public void setAmount(BigDecimal amount) {
         this.amount = amount;
     }
 
