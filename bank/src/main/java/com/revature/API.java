@@ -166,7 +166,11 @@ public class API {
     // viewBalance: Displays the current balance of the account
     private void viewBalance() {
         System.out.println(clearScreen);
-        System.out.println("Your current balance is: " + Business.viewBalance(this.accountID));
+        try {
+            System.out.println("Your current balance is: " + Business.viewBalance(this.accountID));
+        } catch (BankException e) {
+            System.out.println(e.getMessage());
+        }
     }
 
     private void deposit() {
@@ -229,7 +233,7 @@ public class API {
                     System.out.println(clearScreen);
                     System.out.println("$"+ amount + " has been successfully withdrawn from your account.");
                 }
-                catch (InsufficientFundsException | NegativeInputException | MoreThanTwoDecimalPlacesException e){
+                catch (BankException e){
                     System.out.println(clearScreen);
                     System.out.println("Withdrawal failed due to: " + e);
                 }

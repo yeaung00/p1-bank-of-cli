@@ -2,9 +2,7 @@ package com.revature;
 
 import com.revature.exceptions.*;
 import com.revature.exceptions.customexceptions.*;
-import java.sql.SQLException;
 
-import javax.security.auth.login.AccountNotFoundException;
 import java.math.BigDecimal;
 
 public class Business {
@@ -35,7 +33,7 @@ public class Business {
     }
 
     // Gets the balance from the Repository layer - Damon
-    public static double viewBalance(String accountID) throws AccountNotFoundException, DatabaseException {
+    public static double viewBalance(String accountID) throws AccountNotFoundException, DatabaseException, InvalidCredentialsException {
         // interesting interaction that I'm not sure if it needs to be fixed
         // viewBalance doesn't ever have to interact with an Account object:
         // only ever querying the database and returning that value
@@ -89,7 +87,7 @@ public class Business {
     }
 
     // Checks if the withdrawal is valid (Do they have enough? Is the amount positive?) - Ydur
-    public static boolean validWithdraw(String accountID, double amount) throws InsufficientFundsException, NegativeInputException,MoreThanTwoDecimalPlacesException {
+    public static boolean validWithdraw(String accountID, double amount) throws InsufficientFundsException, NegativeInputException, MoreThanTwoDecimalPlacesException, InvalidCredentialsException, AccountNotFoundException, DatabaseException {
         //If amount is more than in the account, a negative number,a non number , has too many decimal places,throw error
         if(amount > viewBalance(accountID)) {
             throw new InsufficientFundsException("The amount withdrawn cannot be more than the account balance.");
