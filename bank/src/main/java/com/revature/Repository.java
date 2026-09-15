@@ -1,10 +1,12 @@
 package com.revature;
 
-import com.revature.utility.ConnectionFactory;
 import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.PreparedStatement;
+
+import com.revature.utility.ConnectionFactory;
+
 import com.revature.exceptions.*;
 import com.revature.exceptions.customexceptions.*;
 
@@ -78,8 +80,22 @@ public class Repository {
     }
 
     // (updateBalance) Updates the value of balance during deposits and withdraws - Connor
-    public static void updateBalance(String accountID, double amount) {
-
+    public static int updateBalance(String accountID, double amount) throws RepositoryException {
+        String sqlQuery = "UPDATE accounts SET balance = ? where accountID = ?";
+        try (
+            Connection connection = ConnectionFactory.getAutoCommitConnect();
+            PreparedStatement ps = connection.prepareStatement(sqlQuery);
+        ) {
+            ps.setDouble(1, amount);
+            ps.setString(2, accountID);
+            int rowsAffected = ps.executeUpdate();
+            if (rowsAffected != 1) {
+                throw new TransactionFailedException("Could not carry out transaction. Please try again.");
+            }
+            return rowsAffected;
+        } catch (SQLException e) {
+            throw new TransactionFailedException("Could not carry out transaction. Please try again");
+        }
     }
 
     // Perform manualCommitConnect() and facilitate a transfer - Ye

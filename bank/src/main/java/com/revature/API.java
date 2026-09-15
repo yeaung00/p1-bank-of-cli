@@ -206,10 +206,10 @@ public class API {
                 } else {
                     System.out.println("Invalid input. Please try again.");
                 }
-            } catch (NegativeInputException e) {
-                System.out.println(e.getMessage() + "Please try again.");
-            } catch (MoreThanTwoDecimalPlacesException e) {
-                System.out.println(e.getMessage() + "Please try again.");
+            } catch (BusinessException e) {
+                System.out.println(e.getMessage());
+            } catch (RepositoryException e) {
+                System.out.println(e.getMessage());
             }
         }
     }
