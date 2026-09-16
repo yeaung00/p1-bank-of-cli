@@ -5,7 +5,13 @@ import com.revature.exceptions.customexceptions.*;
 
 import java.math.BigDecimal;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class Business {
+
+    private static final Logger logger = LoggerFactory.getLogger(Business.class);
+
     // Ydur
     public static boolean verifyRegistration(String accountID) {
         return true;
