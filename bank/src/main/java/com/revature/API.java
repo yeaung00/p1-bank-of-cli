@@ -7,6 +7,9 @@ import java.util.*;
 import com.revature.exceptions.*;
 import com.revature.exceptions.customexceptions.*;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.concurrent.TimeUnit;
 
 public class API {
@@ -17,6 +20,8 @@ public class API {
     private HashMap mockDB;
 
     private static String clearScreen = "\n\n\n\n\n";
+
+    private static final Logger logger = LoggerFactory.getLogger(API.class);
 
     // Constructors
 

@@ -14,7 +14,12 @@ import java.util.ArrayList;
 import com.revature.utility.ConnectionFactory;
 import com.revature.utility.MoneyUtils;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class Repository {
+    private static final Logger logger = LoggerFactory.getLogger(Repository.class);
+
     // Adds a new account after a user registers - Ydur
     public static void addAccount() {
 
