@@ -15,7 +15,7 @@ import com.revature.exceptions.customexceptions.*;
 public class BusinessTest {
     @Test
     @DisplayName("verifyCredentials returns true for valid credentials")
-    void testValidVerifyCredentials() throws Exception {
+    void testValidVerifyCredentials() throws BankException {
         String accountId = "Billy";
         String pin = "1234";
         Account account = new Account(accountId, pin);
