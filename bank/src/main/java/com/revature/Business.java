@@ -17,26 +17,21 @@ public class Business {
     // Ydur
     //accountId should be 10 chars, maybe pin can be verified aswell later
 
-    public static boolean verifyRegistration(String accountId,String pin) throws RuntimeException, SQLException {
+    public static boolean verifyRegistration(String accountId,String pin) throws InvalidCredentialsException {
         //Checks if the length of the name is long enough for an account to be created
         if(accountId.length() > 10 ){
-            throw new RuntimeException("Account Id is too long!");
+            throw new InvalidCredentialsException("Account Id is too long!");
         }
         //If check passes, Passes to Repository layer to checkExistingAccounts() & will addAccount if it passes
         try {
             //If checkExistingAccounts returns false meaning no records with that account exist, run addAccount
             if(!Repository.checkExistingAccounts(accountId)){
                 Repository.addAccount(accountId,pin);
+            }else{
+                return false;
             }
-            else{
-                throw new RuntimeException();
-            }
-        }
-        catch (DatabaseException e) {
-            throw new RuntimeException(e);
-        }
-        catch (SQLException e){
-            throw new RuntimeException(e);
+        } catch (DatabaseException e) {
+            throw new InvalidCredentialsException("There was an issue communicating wih the Database: ",e);
         }
         return true;
     }
@@ -114,6 +109,7 @@ public class Business {
     public static boolean validWithdraw(String accountId, BigDecimal amount) throws InsufficientFundsException, NegativeInputException, MoreThanTwoDecimalPlacesException, InvalidCredentialsException, AccountNotFoundException, DatabaseException, RepositoryException{
         //If amount is more than in the account, a negative number,a non number , has too many decimal places,throw error
 
+
         if(amount.compareTo(viewBalance(accountId)) > 0) {
             throw new InsufficientFundsException("The amount withdrawn cannot be more than the account balance.");
         } else if(amount.compareTo(BigDecimal.ZERO) < 0) {
@@ -122,10 +118,16 @@ public class Business {
         else if(!hasAtMostTwoDecimalPlaces(amount)){
             throw new MoreThanTwoDecimalPlacesException("There were too many decimal places provided.");
         }
-        BigDecimal total = viewBalance(accountId).subtract(amount);
-        Repository.updateBalance(accountId,total);
+
+        try {
+            BigDecimal total = viewBalance(accountId).subtract(amount);
+            Repository.updateBalance(accountId,total);
+        } catch (InvalidCredentialsException | RepositoryException e) {
+            throw new RuntimeException(e);
+        }
 
         return true;
+
     }
 
     // Checks if the transfer is valid (Does the other person have enough? Do you? Is the amount positive?) - Ye
@@ -135,7 +137,7 @@ public class Business {
 
     // Gets the account activity from the repository layer - Yousef
     // for now just returns a string, but in future will return rows of data
-    //maybe can create class reprenting a row of data then use a collections class like
+    //maybe can create class representing a row of data then use a collections class like
     //Arraylist to store the data
     //ArrayList<Transaction> = new ArrayList<>();
     public static ArrayList<Transaction> validateTransactionHistory(String accountID,String pin) throws InvalidCredentialsException, EmptyTransactionHistoryException, DatabaseException{

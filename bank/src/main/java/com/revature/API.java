@@ -75,11 +75,10 @@ public class API {
         try {
             if(Business.verifyRegistration(accountId,pin)){
                 System.out.println(accountId +"'s Account created Successfully!");
+            }else{
+                System.out.println("This account is taken.");
             }
-
-        } catch (RuntimeException e) {
-            System.out.println("This account is taken.");
-        } catch (SQLException e){
+        } catch (InvalidCredentialsException e){
             System.out.println("The Database communication failed");
         }
     }
@@ -246,7 +245,7 @@ public class API {
                     System.out.println(clearScreen);
                     System.out.println("$"+ amount + " has been successfully withdrawn from your account.");
                 }
-                catch (BankException e){
+                catch (RuntimeException | BankException e){
                     System.out.println(clearScreen);
                     System.out.println("Withdrawal failed due to: " + e);
                 }

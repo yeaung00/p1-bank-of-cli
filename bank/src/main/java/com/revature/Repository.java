@@ -22,10 +22,10 @@ public class Repository {
     private static final Logger logger = LoggerFactory.getLogger(Repository.class);
 
     // Adds a new account after a user registers - Ydur
-    public static void addAccount(String accountId,String pin) throws SQLException{
+    public static void addAccount(String accountId,String pin) throws DatabaseException{
         //Creating Query
-        String query = "insert into accounts (account_id, pin_hash) " +
-                "values(?, ?)";
+        String query = "insert into accounts (account_id, pin_hash, balance_cents) " +
+                "values(?, ?, ?)";
         try(
                 //Creating connection using connection factory with autocommit method
                 Connection connection = ConnectionFactory.getAutoCommitConnect();
@@ -33,18 +33,21 @@ public class Repository {
                 PreparedStatement statement = connection.prepareStatement(query)){
             statement.setString(1,accountId);
             statement.setString(2,pin);
+            statement.setString(3,"0");
 
             //execute query
             statement.executeUpdate();
         }
         catch (SQLException e){
-            throw new SQLException("Unable to communicate with the database to verify registration");
+            throw new DatabaseException("Unable to communicate with the database to verify registration",e);
         }
     }
-
+    //Check to see if an account with the given id exists within the DB by querying a record of it and returning true if one is found
     public static boolean checkExistingAccounts(String accountId) throws DatabaseException{
         String query = "SELECT account_id FROM accounts WHERE account_id = ?";
+        //With this connection open using the try-with-resources to close resources within [try(...)],
         try(Connection connection = ConnectionFactory.getAutoCommitConnect()){
+            //On this connection we would like to load a prepared statement with a query, then execute it
             PreparedStatement statement = connection.prepareStatement(query);
             statement.setString(1, accountId);
             ResultSet res = statement.executeQuery();
@@ -52,7 +55,7 @@ public class Repository {
             return res.next();
         }
         catch (SQLException e){
-            throw new DatabaseException("Database error during Account retrieval: ", e);
+            throw new DatabaseException("Database error during Account retrieval: ",e);
         }
     }
 
