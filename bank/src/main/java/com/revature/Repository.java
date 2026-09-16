@@ -110,7 +110,7 @@ public class Repository {
         }
     }
 
-    // (updateBalance) Updates the value of balance during deposits and withdraws - Connor
+    // Updates the value of balance during deposits and withdraws - Connor
     public static int updateBalance(String accountID, BigDecimal amount) throws RepositoryException {
         String query = "UPDATE accounts SET balance_cents = ? WHERE account_id = ?";
         try (
