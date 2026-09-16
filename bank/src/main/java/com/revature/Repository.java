@@ -1,5 +1,6 @@
 package com.revature;
 
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -149,7 +150,7 @@ public class Repository {
                 while(res.next()) {
                     String accID = res.getString("account_id");
                     String tType = res.getString("transaction_type");
-                    int cents = res.getInt("amount_cents");
+                    BigDecimal cents = BigDecimal.valueOf(res.getInt("amount_cents"));
                     String relID = res.getString("related_account_id");
                     String cDate = res.getString("creationDate");
 
