@@ -6,13 +6,13 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.PreparedStatement;
 
-import com.revature.utility.ConnectionFactory;
 import com.revature.exceptions.RepositoryException;
-
 import com.revature.exceptions.*;
 import com.revature.exceptions.customexceptions.*;
 
 import java.util.ArrayList;
+import com.revature.utility.ConnectionFactory;
+import com.revature.utility.MoneyUtils;
 
 public class Repository {
     // Adds a new account after a user registers - Ydur
@@ -79,7 +79,7 @@ public class Repository {
     }
 
     // Might not even need this - Yousef
-    public static double getBalance(String accountID) throws AccountNotFoundException, DatabaseException {
+    public static BigDecimal getBalance(String accountID) throws AccountNotFoundException, DatabaseException {
         // assuming that accountID is unique
         String query = "SELECT balance_cents" +
                         "FROM accounts " +
@@ -94,7 +94,7 @@ public class Repository {
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
                 // process the result
-                return rs.getInt("balance_cents") / 100.0;
+                return MoneyUtils.centsToDollars(rs.getInt("balance_cents"));
             } else {
                 // TODO: similarly to what Yousef specified: this is where the logging would be
 
@@ -108,13 +108,15 @@ public class Repository {
     }
 
     // (updateBalance) Updates the value of balance during deposits and withdraws - Connor
-    public static int updateBalance(String accountID, double amount) throws RepositoryException {
+    public static int updateBalance(String accountID, BigDecimal amount) throws RepositoryException {
         String sqlQuery = "UPDATE accounts SET balance = ? where accountID = ?";
         try (
             Connection connection = ConnectionFactory.getAutoCommitConnect();
             PreparedStatement ps = connection.prepareStatement(sqlQuery);
         ) {
-            ps.setDouble(1, amount);
+            int cents = MoneyUtils.dollarsToCents(amount);
+
+            ps.setInt(1, cents);
             ps.setString(2, accountID);
             int rowsAffected = ps.executeUpdate();
             if (rowsAffected != 1) {
