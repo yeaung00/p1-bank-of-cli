@@ -82,19 +82,25 @@ public class API {
     private boolean login() {
         try {
             System.out.print("Welcome to the login screen. Please provide your Account ID: ");
-            String accountID = s.nextLine();
+            String inputAccountID = s.nextLine();
             System.out.print("\nPlease provide your PIN: ");
-            String pin = s.nextLine();
-            Business.verifyCredentials(accountID, pin);
+            String inputPin = s.nextLine();
+            Business.verifyCredentials(inputAccountID, inputPin);
             System.out.println(clearScreen);
             System.out.println("Login Successful!");
+            accountID = inputAccountID;
             homeAccountPage(accountID);
             return true;
         
-    // I can catch now a general business exception without needing to know 
+    // I can catch now a general bank exception without needing to know 
     // exactly which one the business layer will throw
-        } catch (BusinessException e) {
-            System.out.println("Error: " + e);
+        } catch (BankException e) {
+            // instead of printing to console, e will contain very sensitive information/ internal details
+            // so we must instead log this information into the logger
+            e.printStackTrace();
+            // two outcomes: either db failed to process request
+            // or Credentials given did not match any records in the db
+            // use .getMessage() to print the exception string
             return false;
         }
     }
@@ -161,11 +167,12 @@ public class API {
 
     // viewBalance: Displays the current balance of the account
     private void viewBalance() {
-        // This method will call the business layer to get the balance of the account
         System.out.println(clearScreen);
-        System.out.println("Your current balance is: " + Business.viewBalance(this.accountID));
-
-        // dummy business call
+        try {
+            System.out.println("Your current balance is: $" + Business.viewBalance(this.accountID));
+        } catch (BankException e) {
+            System.out.println(e.getMessage());
+        }
     }
 
     private void deposit() {
@@ -180,7 +187,7 @@ public class API {
             System.out.print("$");
             String input = s.nextLine();
             try {
-                double amount = Double.parseDouble(input);
+                BigDecimal amount = new BigDecimal(input.trim());
                 if (Business.validDeposit(accountID, amount)) {
                     System.out.print("You've deposited $" + amount + ". Thank you!\nRedirecting to home screen...\n");
 
@@ -202,10 +209,10 @@ public class API {
                 } else {
                     System.out.println("Invalid input. Please try again.");
                 }
-            } catch (NegativeInputException e) {
-                System.out.println(e.getMessage() + "Please try again.");
-            } catch (MoreThanTwoDecimalPlacesException e) {
-                System.out.println(e.getMessage() + "Please try again.");
+            } catch (BusinessException e) {
+                System.out.println(e.getMessage());
+            } catch (RepositoryException e) {
+                System.out.println(e.getMessage());
             }
         }
     }
@@ -221,14 +228,14 @@ public class API {
             System.out.print("$");
             String input = s.nextLine();
             try{
-                double amount = Double.parseDouble(input);
+                BigDecimal amount = new BigDecimal(input.trim());
                 try{
                     //Business Layer - Call a  func to validate withdraw amount
-                    Business.validWithdraw(accountID,amount);
+                    Business.validWithdraw(accountID, amount);
                     System.out.println(clearScreen);
                     System.out.println("$"+ amount + " has been successfully withdrawn from your account.");
                 }
-                catch (InsufficientFundsException | NegativeInputException | MoreThanTwoDecimalPlacesException e){
+                catch (BankException e){
                     System.out.println(clearScreen);
                     System.out.println("Withdrawal failed due to: " + e);
                 }
@@ -249,9 +256,9 @@ public class API {
     // Ye
     private void transfer() {
         System.out.println("Please input the account ID you'd like to transfer to.");
-        String  toId = s.nextLine();
+        String toId = s.nextLine();
         System.out.println("Please input transfer amount.");
-        double amount = Double.parseDouble(s.nextLine());
+        BigDecimal amount = new BigDecimal(s.nextLine().trim());
         // Business Layer validates transaction
         // Business.transfer(fromId, toId, amount)
         System.out.println("You've transferred $" + amount + " to " + toId + ".");

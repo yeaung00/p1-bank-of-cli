@@ -14,47 +14,57 @@ public class Business {
     // Yousef
     // This method verifies both the account id and pin pair by checking the db if it contains it
     // This method can throw an exception if the repo layer encounters an error with not finding the respective credentials
-    public static boolean verifyCredentials (String accountID, String pin) throws InvalidCredentialsException {
+    public static boolean verifyCredentials(String accountID, String pin) throws InvalidCredentialsException, DatabaseException {
         // make call to repository layer to check for AccountID and pin pair in future
-        // for now just check if accountID = "Billy" to test all branch flows
+        try{
+            Account res = Repository.getAccount(accountID, pin);
 
-        // When testing, login with accoundID "Billy" and Pin "4"
-        if(accountID.equals("Billy") && pin.equals("4")){
-            return true;
-        }
-        else {
-            //We should make the message for the exceptions in the business layer more verbose for better debugging,
-            //then when we pass the exception down to the api layer, make it less verbose to hide implementation detail
-            //ex: we could have the message here explain exactly which part was invalid ("account id, pin, or both")
-            throw new InvalidCredentialsException("Invalid Account ID or PIN");
+            return(res.getAccountId().equals(accountID) && res.getPin().equals(pin));
+
+        } catch (RepositoryException e) {
+            if (e instanceof AccountNotFoundException) {
+                throw new InvalidCredentialsException("Invalid Account ID or PIN", e);
+            }
+            if (e instanceof DatabaseException databaseException) {
+                throw databaseException;
+            }
+            return false;
         }
     }
 
     // Gets the balance from the Repository layer - Damon
-    public static double viewBalance(String accountID) {
-        // assuming that there will be a database connection to retrieve the balance for the given accountID
-        // for now, we will just print a mock balance
-        double balance = 1000.00; // Mock balance for now
-        /*
-            Generally, how it will look with a database connection:
-            double balance = database.getBalance(accountID);
-            System.out.println("Your current balance is: $" + balance);
-         */
-        return balance;
+    public static BigDecimal viewBalance(String accountID) throws AccountNotFoundException, DatabaseException, InvalidCredentialsException {
+        // interesting interaction that I'm not sure if it needs to be fixed
+        // viewBalance doesn't ever have to interact with an Account object:
+        // only ever querying the database and returning that value
+        try {
+            return Repository.getBalance(accountID);
+        } catch (RepositoryException e) {
+            if (e instanceof AccountNotFoundException) {
+                throw new InvalidCredentialsException("Invalid accountID", e);
+            }
+            if (e instanceof DatabaseException dbException) {
+                throw dbException;
+            }
+
+            // this return value can be changed for better logging/error purposes
+            return BigDecimal.ZERO;
+        }
     }
     
     // Checks if the deposit is valid (Is the amount positive?) - Connor
-    public static boolean validDeposit(String accountID, double amount) throws NegativeInputException, MoreThanTwoDecimalPlacesException {
-        // If the amount is negataive, it is not a valid deposit
-        if (amount < 0) {
-            throw new NegativeInputException("You cannot input a negative amount to deposit. ");
+    public static boolean validDeposit(String accountID, BigDecimal amount) throws BusinessException, RepositoryException {
+        // If the amount is negative, it is not a valid deposit
+        if (amount.compareTo(BigDecimal.ZERO) < 0) {
+            throw new NegativeInputException("You cannot input a negative amount to deposit. Please try again");
         } else if (!hasAtMostTwoDecimalPlaces(amount)) {
-            throw new MoreThanTwoDecimalPlacesException("The amount cannot have more than two decimal places. ");
+            throw new MoreThanTwoDecimalPlacesException("The amount cannot have more than two decimal places. Please try again.");
         }
 
         // Send a request to the repo layer to update the balance to total
-        double total = viewBalance(accountID) + amount;
-        System.out.println("This would send the deposit request to the Repo layer...");
+        BigDecimal total = viewBalance(accountID).add(amount);
+        Repository.updateBalance(accountID, total);
+        System.out.println("This is where the Account object would update the balance");
 
         // Return true if everything above succeeds
         return true;
@@ -66,22 +76,16 @@ public class Business {
      * Checks if the amount you want to deposit has at most two decimal places.
      * E.g, $100.45 would return true, $100.456 would return false.
      */
-    private static boolean hasAtMostTwoDecimalPlaces(double amount) {
-        // Convert the double to a String, and then to a BigDecimal
-        String text = Double.toString(amount);
-        BigDecimal bd = new BigDecimal(text);
-
-        // Checks if the amount has at most 2 decimal places (can't deposit $100.345)
-        int decimalPlaces = bd.scale();
-        return decimalPlaces >= 0 && decimalPlaces <= 2;
+    private static boolean hasAtMostTwoDecimalPlaces(BigDecimal amount) {
+        return amount.scale() <= 2;
     }
 
     // Checks if the withdrawal is valid (Do they have enough? Is the amount positive?) - Ydur
-    public static boolean validWithdraw(String accountID, double amount) throws InsufficientFundsException, NegativeInputException,MoreThanTwoDecimalPlacesException {
+    public static boolean validWithdraw(String accountID, BigDecimal amount) throws InsufficientFundsException, NegativeInputException, MoreThanTwoDecimalPlacesException, InvalidCredentialsException, AccountNotFoundException, DatabaseException {
         //If amount is more than in the account, a negative number,a non number , has too many decimal places,throw error
-        if(amount > Business.viewBalance(accountID)) {
+        if(amount.compareTo(viewBalance(accountID)) > 0) {
             throw new InsufficientFundsException("The amount withdrawn cannot be more than the account balance.");
-        }else if(amount < 0){
+        } else if(amount.compareTo(BigDecimal.ZERO) < 0) {
             throw new NegativeInputException("Unable to withdraw a negative amount.");
         }
         else if(!hasAtMostTwoDecimalPlaces(amount)){
@@ -91,7 +95,7 @@ public class Business {
     }
 
     // Checks if the transfer is valid (Does the other person have enough? Do you? Is the amount positive?) - Ye
-    public static boolean validTransfer(String accountIDFrom, String accountIDTo, double amount) {
+    public static boolean validTransfer(String accountIDFrom, String accountIDTo, BigDecimal amount) {
         return true;
     }
 
