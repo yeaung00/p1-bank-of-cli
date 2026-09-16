@@ -261,7 +261,7 @@ public class API {
         try {
             BigDecimal amount = new BigDecimal(s.nextLine().trim());
             Business.validTransfer(accountID, toID, amount);
-            System.out.println("You've transferred $" + amount + " to " + toId + ".");
+            System.out.println("You've transferred $" + amount + " to " + toID + ".");
         } catch (NumberFormatException e) {
             System.out.println("Please enter a valid numeric value.");
         } catch (BankException e) {
