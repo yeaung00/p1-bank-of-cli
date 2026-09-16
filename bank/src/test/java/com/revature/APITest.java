@@ -1,6 +1,6 @@
 package com.revature;
 import org.junit.jupiter.api.*;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 //we will create mock db using mockito
 import org.mockito.Mockito;
