@@ -80,9 +80,7 @@ public class Repository {
     // Might not even need this - Yousef
     public static BigDecimal getBalance(String accountID) throws AccountNotFoundException, DatabaseException {
         // assuming that accountID is unique
-        String query = "SELECT balance_cents" +
-                        "FROM accounts " +
-                        "WHERE account_id = ?";
+        String query = "SELECT balance_cents FROM accounts WHERE account_id = ?";
 
         try (
                 Connection conn = ConnectionFactory.getAutoCommitConnect();

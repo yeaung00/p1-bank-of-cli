@@ -82,12 +82,13 @@ public class API {
     private boolean login() {
         try {
             System.out.print("Welcome to the login screen. Please provide your Account ID: ");
-            String accountID = s.nextLine();
+            String inputAccountID = s.nextLine();
             System.out.print("\nPlease provide your PIN: ");
-            String pin = s.nextLine();
-            Business.verifyCredentials(accountID, pin);
+            String inputPin = s.nextLine();
+            Business.verifyCredentials(inputAccountID, inputPin);
             System.out.println(clearScreen);
             System.out.println("Login Successful!");
+            accountID = inputAccountID;
             homeAccountPage(accountID);
             return true;
         
