@@ -169,7 +169,7 @@ public class API {
     private void viewBalance() {
         System.out.println(clearScreen);
         try {
-            System.out.println("Your current balance is: " + Business.viewBalance(this.accountID));
+            System.out.println("Your current balance is: $" + Business.viewBalance(this.accountID));
         } catch (BankException e) {
             System.out.println(e.getMessage());
         }
