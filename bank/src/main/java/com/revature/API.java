@@ -265,14 +265,94 @@ public class API {
     //yousef
     // displays transaction activity from db
     private void transactionHistory(String accountID, String pin) {
-        //temporarily adding info into transaction history
-        try{
+        final int pageSize = 5;
+        try {
             ArrayList<Transaction> res = Business.validateTransactionHistory(accountID, pin);
-            if(res == null) {
-                System.out.println("history is empty");
+            if (res.isEmpty()) {
+                System.out.println("History is empty");
+                return;
             }
-        } catch(BankException e) {
-            System.out.println("Error:" + e);
+            int page = 0;
+            boolean browsing = true;
+            while (browsing) {
+                System.out.print(clearScreen);
+                int start = page * pageSize;
+                int end = Math.min(start + pageSize, res.size());
+                System.out.println("Transaction History");
+                System.out.println("-------------------");
+                for (int i = start; i < end; i++) {
+                    Transaction transaction = res.get(i);
+                    switch (transaction.getType()) {
+                        case "DEPOSIT":
+                            System.out.println("Deposited $" + transaction.getAmount()
+                                    + " on " + transaction.getCreationDate());
+                            break;
+                        case "WITHDRAWAL":
+                            System.out.println("Withdrew $" + transaction.getAmount()
+                                    + " on " + transaction.getCreationDate());
+                            break;
+                        case "TRANSFER_IN":
+                            System.out.println("Received $" + transaction.getAmount()
+                                    + " from " + transaction.getRelatedAccountId()
+                                    + " on " + transaction.getCreationDate());
+                            break;
+                        case "TRANSFER_OUT":
+                            System.out.println("Transferred $" + transaction.getAmount()
+                                    + " to " + transaction.getRelatedAccountId()
+                                    + " on " + transaction.getCreationDate());
+                            break;
+                        default:
+                            System.out.println("Unknown transaction type: " + transaction.getType());
+                            break;
+                    }
+                }
+                int totalPages = (res.size() + pageSize - 1) / pageSize;
+                System.out.println("\nPage " + (page + 1) + " of " + totalPages);
+                System.out.println("[n] Next  [p] Previous  [q] Quit");
+                System.out.print(">>");
+                String command = s.nextLine().toLowerCase();
+                switch (command) {
+                    case "n":
+                        if (end < res.size()) {
+                            page++;
+                        } else {
+                            System.out.println();
+                            System.out.println();
+                            System.out.println("You are on the last page!");
+                            waitALittle(2);
+                        }
+                        break;
+                    case "p":
+                        if (page > 0) {
+                            page--;
+                        } else {
+                            System.out.println();
+                            System.out.println();
+                            System.out.println("You are on the first page.!");
+                            waitALittle(2);
+                        }
+                        break;
+                    case "q":
+                        browsing = false;
+                        break;
+                    default:
+                        System.out.println();
+                        System.out.println();
+                        System.out.println("Invalid option!");
+                        waitALittle(2);
+                        break;
+                }
+            }
+        } catch (BankException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    private void waitALittle(int seconds){
+        try {
+            TimeUnit.SECONDS.sleep(2);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
         }
     }
 

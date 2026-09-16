@@ -137,6 +137,7 @@ public class Repository {
 
     // Retrieves the tranactions for an associated accountID - Yousef
     public static ArrayList<Transaction> getTransactionHistory(String accountID) throws EmptyTransactionHistory, DatabaseException {
+        //TODO: I will need to go back and then order by creationDate asc in order to get the transaction history in order
         String query = "SELECT * FROM transactions t WHERE t.account_id = ?";
         ArrayList<Transaction> out = new ArrayList<>();
         try(   
@@ -151,8 +152,10 @@ public class Repository {
                     int cents = res.getInt("amount_cents");
                     String relID = res.getString("related_account_id");
                     String cDate = res.getString("creationDate");
-                    // here I would create an account obj and pass in the retrieved record values as params
-                    // then add the obj to out
+
+                    //TODO: We should not be storing transaction_id in Transaction class b/c that is handled in db side
+                    //for now, we put placeover text for it until its deleted
+                    out.add(new Transaction("placeholder", accID, tType, cents, relID, cDate));
                 }
                 if(out.size() == 0) {
                     throw new EmptyTransactionHistory("No transaction history found for account: " + accountID);
