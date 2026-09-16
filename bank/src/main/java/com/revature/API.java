@@ -7,6 +7,7 @@ import com.revature.exceptions.*;
 import com.revature.exceptions.customexceptions.*;
 
 import java.util.concurrent.TimeUnit;
+import java.math.BigDecimal;
 
 public class API {
     // Attributes
@@ -185,7 +186,7 @@ public class API {
             System.out.print("$");
             String input = s.nextLine();
             try {
-                double amount = Double.parseDouble(input);
+                BigDecimal amount = new BigDecimal(input.trim());
                 if (Business.validDeposit(accountID, amount)) {
                     System.out.print("You've deposited $" + amount + ". Thank you!\nRedirecting to home screen...\n");
 
@@ -226,7 +227,7 @@ public class API {
             System.out.print("$");
             String input = s.nextLine();
             try{
-                double amount = Double.parseDouble(input);
+                BigDecimal amount = new BigDecimal(input.trim());
                 try{
                     //Business Layer - Call a  func to validate withdraw amount
                     Business.validWithdraw(accountID,amount);

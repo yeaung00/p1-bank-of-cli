@@ -11,6 +11,8 @@ import com.revature.exceptions.RepositoryException;
 import com.revature.exceptions.*;
 import com.revature.exceptions.customexceptions.*;
 
+import java.math.BigDecimal;
+
 public class Repository {
     // Adds a new account after a user registers - Ydur
     public static void addAccount() {
@@ -76,7 +78,7 @@ public class Repository {
     }
 
     // Might not even need this - Yousef
-    public static double getBalance(String accountID) throws AccountNotFoundException, DatabaseException {
+    public static BigDecimal getBalance(String accountID) throws AccountNotFoundException, DatabaseException {
         // assuming that accountID is unique
         String query = "SELECT balance_cents" +
                         "FROM accounts " +
@@ -91,7 +93,7 @@ public class Repository {
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
                 // process the result
-                return rs.getInt("balance_cents") / 100.0;
+                return BigDecimal.valueOf(rs.getInt("balance_cents"), 2);
             } else {
                 // TODO: similarly to what Yousef specified: this is where the logging would be
 
@@ -105,13 +107,13 @@ public class Repository {
     }
 
     // (updateBalance) Updates the value of balance during deposits and withdraws - Connor
-    public static int updateBalance(String accountID, double amount) throws RepositoryException {
+    public static int updateBalance(String accountID, BigDecimal amount) throws RepositoryException {
         String sqlQuery = "UPDATE accounts SET balance = ? where accountID = ?";
         try (
             Connection connection = ConnectionFactory.getAutoCommitConnect();
             PreparedStatement ps = connection.prepareStatement(sqlQuery);
         ) {
-            ps.setDouble(1, amount);
+            ps.setInt(1, amount.movePointRight(2).intValueExact());
             ps.setString(2, accountID);
             int rowsAffected = ps.executeUpdate();
             if (rowsAffected != 1) {
