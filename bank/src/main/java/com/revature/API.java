@@ -1,11 +1,15 @@
 package com.revature;
 
+import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.sql.SQLOutput;
 import java.util.*;
 
 import com.revature.exceptions.*;
 import com.revature.exceptions.customexceptions.*;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.TimeUnit;
 
@@ -16,6 +20,8 @@ public class API {
     private String pin;
 
     private static String clearScreen = "\n\n\n\n\n";
+
+    private static final Logger logger = LoggerFactory.getLogger(API.class);
 
     // Constructors
 
@@ -84,13 +90,17 @@ public class API {
     private boolean login() {
         try {
             System.out.print("Welcome to the login screen. Please provide your Account ID: ");
-            String accountId = s.nextLine();
+            String inputAccountId = s.nextLine();
             System.out.print("\nPlease provide your PIN: ");
-            String pin = s.nextLine();
-            Business.verifyCredentials(accountId, pin);
+            String inputPin = s.nextLine();
+            Business.verifyCredentials(inputAccountId, inputPin);
             System.out.println(clearScreen);
             System.out.println("Login Successful!");
-            homeAccountPage(accountId);
+            //TODO: will need to fix the discrepency with how we use local var accountID and pin with field variabel
+            //accountID and pin
+            accountId = inputAccountId;
+            pin = inputPin;
+            homeAccountPage(accountId, pin);
             return true;
         
     // I can catch now a general bank exception without needing to know 
@@ -109,7 +119,7 @@ public class API {
     // This will be the query loop where it will ask you what you want to do:
     // view balance, deposit, withdraw, transfer, or view activity
     // Damon
-    private void homeAccountPage(String accountId) {
+    private void homeAccountPage(String accountId, String pin) {
         // Another query loop with those 5 tasks
         // would we want these messages to print each time you get to this page?
         // in that case, if you return from any of the actions, maybe we should move these into the while loop?
@@ -151,7 +161,7 @@ public class API {
                     break;
                 case "v":
                     // same thing here
-                    transactionHistory(accountId);
+                    transactionHistory(accountId, pin);
                     break;
                 case "q":
                     // same thing here
@@ -188,7 +198,7 @@ public class API {
             System.out.print("$");
             String input = s.nextLine();
             try {
-                double amount = Double.parseDouble(input);
+                BigDecimal amount = new BigDecimal(input.trim());
                 if (Business.validDeposit(accountId, amount)) {
                     System.out.print("You've deposited $" + amount + ". Thank you!\nRedirecting to home screen...\n");
 
@@ -229,10 +239,10 @@ public class API {
             System.out.print("$");
             String input = s.nextLine();
             try{
-                double amount = Double.parseDouble(input);
+                BigDecimal amount = new BigDecimal(input.trim());
                 try{
                     //Business Layer - Call a  func to validate withdraw amount
-                    Business.validWithdraw(accountId,amount);
+                    Business.validWithdraw(accountId, amount);
                     System.out.println(clearScreen);
                     System.out.println("$"+ amount + " has been successfully withdrawn from your account.");
                 }
@@ -257,9 +267,9 @@ public class API {
     // Ye
     private void transfer() {
         System.out.println("Please input the account ID you'd like to transfer to.");
-        String  toId = s.nextLine();
+        String toId = s.nextLine();
         System.out.println("Please input transfer amount.");
-        double amount = Double.parseDouble(s.nextLine());
+        BigDecimal amount = new BigDecimal(s.nextLine().trim());
         // Business Layer validates transaction
         // Business.transfer(fromId, toId, amount)
         System.out.println("You've transferred $" + amount + " to " + toId + ".");
@@ -267,13 +277,95 @@ public class API {
 
     //yousef
     // displays transaction activity from db
-    private void transactionHistory(String accountId) {
-        //temporarily adding info into transaction history
-        try{
-            String res = Business.validateTransactionHistory(accountId);
-            System.out.println(res);
-        } catch(BusinessException e) {
-            System.out.println("Error:" + e);
+    private void transactionHistory(String accountId, String pin) {
+        final int pageSize = 5;
+        try {
+            ArrayList<Transaction> res = Business.validateTransactionHistory(accountId, pin);
+            if (res.isEmpty()) {
+                System.out.println("History is empty");
+                return;
+            }
+            int page = 0;
+            boolean browsing = true;
+            while (browsing) {
+                System.out.print(clearScreen);
+                int start = page * pageSize;
+                int end = Math.min(start + pageSize, res.size());
+                System.out.println("Transaction History");
+                System.out.println("-------------------");
+                for (int i = start; i < end; i++) {
+                    Transaction transaction = res.get(i);
+                    switch (transaction.getType()) {
+                        case "DEPOSIT":
+                            System.out.println("Deposited $" + transaction.getAmount()
+                                    + " on " + transaction.getCreationDate());
+                            break;
+                        case "WITHDRAWAL":
+                            System.out.println("Withdrew $" + transaction.getAmount()
+                                    + " on " + transaction.getCreationDate());
+                            break;
+                        case "TRANSFER_IN":
+                            System.out.println("Received $" + transaction.getAmount()
+                                    + " from " + transaction.getRelatedAccountId()
+                                    + " on " + transaction.getCreationDate());
+                            break;
+                        case "TRANSFER_OUT":
+                            System.out.println("Transferred $" + transaction.getAmount()
+                                    + " to " + transaction.getRelatedAccountId()
+                                    + " on " + transaction.getCreationDate());
+                            break;
+                        default:
+                            System.out.println("Unknown transaction type: " + transaction.getType());
+                            break;
+                    }
+                }
+                int totalPages = (res.size() + pageSize - 1) / pageSize;
+                System.out.println("\nPage " + (page + 1) + " of " + totalPages);
+                System.out.println("[n] Next  [p] Previous  [q] Quit");
+                System.out.print(">>");
+                String command = s.nextLine().toLowerCase();
+                switch (command) {
+                    case "n":
+                        if (end < res.size()) {
+                            page++;
+                        } else {
+                            System.out.println();
+                            System.out.println();
+                            System.out.println("You are on the last page!");
+                            waitALittle(2);
+                        }
+                        break;
+                    case "p":
+                        if (page > 0) {
+                            page--;
+                        } else {
+                            System.out.println();
+                            System.out.println();
+                            System.out.println("You are on the first page.!");
+                            waitALittle(2);
+                        }
+                        break;
+                    case "q":
+                        browsing = false;
+                        break;
+                    default:
+                        System.out.println();
+                        System.out.println();
+                        System.out.println("Invalid option!");
+                        waitALittle(2);
+                        break;
+                }
+            }
+        } catch (BankException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    private void waitALittle(int seconds){
+        try {
+            TimeUnit.SECONDS.sleep(2);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
         }
     }
 

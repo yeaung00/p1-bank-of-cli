@@ -1,14 +1,26 @@
 package com.revature;
 
+import java.math.BigDecimal;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.PreparedStatement;
 import java.sql.*;
 
-import com.revature.utility.ConnectionFactory;
 import com.revature.exceptions.RepositoryException;
-
 import com.revature.exceptions.*;
 import com.revature.exceptions.customexceptions.*;
 
+import java.util.ArrayList;
+import com.revature.utility.ConnectionFactory;
+import com.revature.utility.MoneyUtils;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class Repository {
+    private static final Logger logger = LoggerFactory.getLogger(Repository.class);
+
     // Adds a new account after a user registers - Ydur
     public static void addAccount(String accountId,String pin) throws SQLException{
         //Creating Query
@@ -43,7 +55,6 @@ public class Repository {
             throw new DatabaseException("Database error during Account retrieval: ", e);
         }
     }
-
 
     // Gets the accountID and PIN to verify the credentials when logging in - Yousef
     public static Account getAccount(String AccountID, String pin) throws AccountNotFoundException, DatabaseException {
@@ -104,22 +115,20 @@ public class Repository {
     }
 
     // Might not even need this - Yousef
-    public static double getBalance(String accountID) throws AccountNotFoundException, DatabaseException {
+    public static BigDecimal getBalance(String accountId) throws AccountNotFoundException, DatabaseException {
         // assuming that accountID is unique
-        String query = "SELECT balance_cents" +
-                        "FROM accounts " +
-                        "WHERE account_id = ?";
+        String query = "SELECT balance_cents FROM accounts WHERE account_id = ?";
 
         try (
                 Connection conn = ConnectionFactory.getAutoCommitConnect();
                 PreparedStatement ps = conn.prepareStatement(query)
         ) {
-            ps.setString(1, accountID);
+            ps.setString(1, accountId);
 
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
                 // process the result
-                return rs.getInt("balance_cents") / 100.0;
+                return MoneyUtils.centsToDollars(rs.getInt("balance_cents"));
             } else {
                 // TODO: similarly to what Yousef specified: this is where the logging would be
 
@@ -133,21 +142,22 @@ public class Repository {
     }
 
     // (updateBalance) Updates the value of balance during deposits and withdraws - Connor
-    public static int updateBalance(String accountID, double amount) throws RepositoryException {
-        String sqlQuery = "UPDATE accounts SET balance = ? where accountID = ?";
+    public static int updateBalance(String accountId, BigDecimal amount) throws RepositoryException {
+        String query = "UPDATE accounts SET balance_cents = ? WHERE account_id = ?";
         try (
             Connection connection = ConnectionFactory.getAutoCommitConnect();
-            PreparedStatement ps = connection.prepareStatement(sqlQuery);
+            PreparedStatement ps = connection.prepareStatement(query)
         ) {
-            ps.setDouble(1, amount);
-            ps.setString(2, accountID);
+            int cents = MoneyUtils.dollarsToCents(amount);
+            ps.setInt(1, cents);
+            ps.setString(2, accountId);
             int rowsAffected = ps.executeUpdate();
             if (rowsAffected != 1) {
                 throw new TransactionFailedException("Could not carry out transaction. Please try again.");
             }
             return rowsAffected;
         } catch (SQLException e) {
-            throw new TransactionFailedException("Could not carry out transaction. Please try again");
+            throw new TransactionFailedException("Could not carry out transaction. Please try again.");
         }
     }
 
@@ -162,7 +172,35 @@ public class Repository {
     }
 
     // Retrieves the tranactions for an associated accountID - Yousef
-    public static void viewTransactionHistory() {
+    public static ArrayList<Transaction> getTransactionHistory(String accountID) throws EmptyTransactionHistoryException, DatabaseException {
+        //TODO: I will need to go back and then order by creationDate asc in order to get the transaction history in order
+        String query = "SELECT * FROM transactions t WHERE t.account_id = ?";
+        ArrayList<Transaction> out = new ArrayList<>();
+        try(
+            Connection connection = ConnectionFactory.getAutoCommitConnect();
+            PreparedStatement statement = connection.prepareStatement(query);
+        ) {
+            statement.setString(1, accountID);
+            try (ResultSet res = statement.executeQuery()) {
+                while(res.next()) {
+                    String accID = res.getString("account_id");
+                    String tType = res.getString("transaction_type");
+                    int cents = res.getInt("amount_cents");
+                    BigDecimal dollars = MoneyUtils.centsToDollars(cents);
+                    String relID = res.getString("related_account_id");
+                    String cDate = res.getString("creationDate");
 
+                    //TODO: We should not be storing transaction_id in Transaction class b/c that is handled in db side
+                    //for now, we put placeover text for it until its deleted
+                    out.add(new Transaction("placeholder", accID, tType, dollars, relID, cDate));
+                }
+                if(out.size() == 0) {
+                    throw new EmptyTransactionHistoryException("No transaction history found for account: " + accountID);
+                }
+                return out;
+            }
+        } catch (SQLException e) {
+            throw new DatabaseException("Database error during Transaction retrieval: ", e);
+        }
     }
 }

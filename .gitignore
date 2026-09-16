@@ -3,3 +3,6 @@ out/
 
 # Maven build output
 target/
+
+# Logs
+logs/

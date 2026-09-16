@@ -4,9 +4,16 @@ import com.revature.exceptions.*;
 import com.revature.exceptions.customexceptions.*;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.sql.SQLException;
 
 public class Business {
+
+    private static final Logger logger = LoggerFactory.getLogger(Business.class);
+
     // Ydur
     //accountId should be 10 chars, maybe pin can be verified aswell later
 
@@ -32,18 +39,17 @@ public class Business {
             throw new RuntimeException(e);
         }
         return true;
-
     }
 
     // Yousef
     // This method verifies both the account id and pin pair by checking the db if it contains it
     // This method can throw an exception if the repo layer encounters an error with not finding the respective credentials
-    public static boolean verifyCredentials (String accountID, String pin) throws InvalidCredentialsException, DatabaseException {
+    public static boolean verifyCredentials(String accountId, String pin) throws InvalidCredentialsException, DatabaseException {
         // make call to repository layer to check for AccountID and pin pair in future
         try{
-            Account res = Repository.getAccount(accountID, pin);
+            Account res = Repository.getAccount(accountId, pin);
 
-            return(res.getAccountId().equals(accountID) && res.getPin().equals(pin));
+            return(res.getAccountId().equals(accountId) && res.getPin().equals(pin));
 
         } catch (RepositoryException e) {
             if (e instanceof AccountNotFoundException) {
@@ -57,7 +63,7 @@ public class Business {
     }
 
     // Gets the balance from the Repository layer - Damon
-    public static double viewBalance(String accountID) throws AccountNotFoundException, DatabaseException, InvalidCredentialsException {
+    public static BigDecimal viewBalance(String accountID) throws AccountNotFoundException, DatabaseException, InvalidCredentialsException {
         // interesting interaction that I'm not sure if it needs to be fixed
         // viewBalance doesn't ever have to interact with an Account object:
         // only ever querying the database and returning that value
@@ -72,22 +78,22 @@ public class Business {
             }
 
             // this return value can be changed for better logging/error purposes
-            return 0.0;
+            return BigDecimal.ZERO;
         }
     }
     
     // Checks if the deposit is valid (Is the amount positive?) - Connor
-    public static boolean validDeposit(String accountID, double amount) throws BusinessException, RepositoryException {
-        // If the amount is negataive, it is not a valid deposit
-        if (amount < 0) {
+    public static boolean validDeposit(String accountId, BigDecimal amount) throws BusinessException, RepositoryException {
+        // If the amount is negative, it is not a valid deposit
+        if (amount.compareTo(BigDecimal.ZERO) < 0) {
             throw new NegativeInputException("You cannot input a negative amount to deposit. Please try again");
         } else if (!hasAtMostTwoDecimalPlaces(amount)) {
             throw new MoreThanTwoDecimalPlacesException("The amount cannot have more than two decimal places. Please try again.");
         }
 
         // Send a request to the repo layer to update the balance to total
-        double total = viewBalance(accountID) + amount;
-        Repository.updateBalance(accountID, total);
+        BigDecimal total = viewBalance(accountId).add(amount);
+        Repository.updateBalance(accountId, total);
         System.out.println("This is where the Account object would update the balance");
 
         // Return true if everything above succeeds
@@ -100,22 +106,16 @@ public class Business {
      * Checks if the amount you want to deposit has at most two decimal places.
      * E.g, $100.45 would return true, $100.456 would return false.
      */
-    private static boolean hasAtMostTwoDecimalPlaces(double amount) {
-        // Convert the double to a String, and then to a BigDecimal
-        String text = Double.toString(amount);
-        BigDecimal bd = new BigDecimal(text);
-
-        // Checks if the amount has at most 2 decimal places (can't deposit $100.345)
-        int decimalPlaces = bd.scale();
-        return decimalPlaces >= 0 && decimalPlaces <= 2;
+    private static boolean hasAtMostTwoDecimalPlaces(BigDecimal amount) {
+        return amount.scale() <= 2;
     }
 
     // Checks if the withdrawal is valid (Do they have enough? Is the amount positive?) - Ydur
-    public static boolean validWithdraw(String accountID, double amount) throws InsufficientFundsException, NegativeInputException, MoreThanTwoDecimalPlacesException, InvalidCredentialsException, AccountNotFoundException, DatabaseException {
+    public static boolean validWithdraw(String accountId, BigDecimal amount) throws InsufficientFundsException, NegativeInputException, MoreThanTwoDecimalPlacesException, InvalidCredentialsException, AccountNotFoundException, DatabaseException {
         //If amount is more than in the account, a negative number,a non number , has too many decimal places,throw error
-        if(amount > viewBalance(accountID)) {
+        if(amount.compareTo(viewBalance(accountId)) > 0) {
             throw new InsufficientFundsException("The amount withdrawn cannot be more than the account balance.");
-        }else if(amount < 0){
+        } else if(amount.compareTo(BigDecimal.ZERO) < 0) {
             throw new NegativeInputException("Unable to withdraw a negative amount.");
         }
         else if(!hasAtMostTwoDecimalPlaces(amount)){
@@ -125,7 +125,7 @@ public class Business {
     }
 
     // Checks if the transfer is valid (Does the other person have enough? Do you? Is the amount positive?) - Ye
-    public static boolean validTransfer(String accountIDFrom, String accountIDTo, double amount) {
+    public static boolean validTransfer(String accountIdFrom, String accountIdTo, BigDecimal amount) {
         return true;
     }
 
@@ -134,14 +134,8 @@ public class Business {
     //maybe can create class reprenting a row of data then use a collections class like
     //Arraylist to store the data
     //ArrayList<Transaction> = new ArrayList<>();
-    public static String validateTransactionHistory(String accountID) throws EmptyTransactionActivityException{
-        // just testing full logic flow, we would call a method(like getTransactionActivity()) in repository layer here that fetches
-        // transaction activity
-        if(accountID.equals("Billy")) {
-            return "here we would return data from db";
-        }
-        else {
-            throw new EmptyTransactionActivityException("No transaction activity found for account: " + accountID);
-        }
+    public static ArrayList<Transaction> validateTransactionHistory(String accountID,String pin) throws InvalidCredentialsException, EmptyTransactionHistoryException, DatabaseException{
+        verifyCredentials(accountID, pin);
+        return Repository.getTransactionHistory(accountID);
     }
 }
