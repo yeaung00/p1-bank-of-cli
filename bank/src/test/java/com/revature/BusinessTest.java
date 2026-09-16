@@ -27,6 +27,7 @@ public class BusinessTest {
         }
     }
     @Test
+    @DisplayName("verifyCredentials throws for invalid credentials")
     void testInvalidCredentials() {
         String accountId = "Billy";
         String pin = "wrong";
