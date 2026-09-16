@@ -152,13 +152,14 @@ public class Repository {
                 while(res.next()) {
                     String accID = res.getString("account_id");
                     String tType = res.getString("transaction_type");
-                    BigDecimal cents = BigDecimal.valueOf(res.getInt("amount_cents"));
+                    int cents = res.getInt("amount_cents");
+                    BigDecimal dollars = MoneyUtils.centsToDollars(cents);
                     String relID = res.getString("related_account_id");
                     String cDate = res.getString("creationDate");
 
                     //TODO: We should not be storing transaction_id in Transaction class b/c that is handled in db side
                     //for now, we put placeover text for it until its deleted
-                    out.add(new Transaction("placeholder", accID, tType, cents, relID, cDate));
+                    out.add(new Transaction("placeholder", accID, tType, dollars, relID, cDate));
                 }
                 if(out.size() == 0) {
                     throw new EmptyTransactionHistoryException("No transaction history found for account: " + accountID);
