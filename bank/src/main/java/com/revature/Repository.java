@@ -133,7 +133,7 @@ public class Repository {
                 // TODO: similarly to what Yousef specified: this is where the logging would be
 
                 // assuming the AccountNotFoundException is implemented
-                throw new AccountNotFoundException("Account not found: " + accountID);
+                throw new AccountNotFoundException("Account not found: " + accountId);
             }
         } catch (SQLException e) {
             // assuming the DatabaseException is implemented
@@ -149,6 +149,7 @@ public class Repository {
             PreparedStatement ps = connection.prepareStatement(query)
         ) {
             int cents = MoneyUtils.dollarsToCents(amount);
+
             ps.setInt(1, cents);
             ps.setString(2, accountId);
             int rowsAffected = ps.executeUpdate();

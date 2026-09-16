@@ -111,8 +111,9 @@ public class Business {
     }
 
     // Checks if the withdrawal is valid (Do they have enough? Is the amount positive?) - Ydur
-    public static boolean validWithdraw(String accountId, BigDecimal amount) throws InsufficientFundsException, NegativeInputException, MoreThanTwoDecimalPlacesException, InvalidCredentialsException, AccountNotFoundException, DatabaseException {
+    public static boolean validWithdraw(String accountId, BigDecimal amount) throws InsufficientFundsException, NegativeInputException, MoreThanTwoDecimalPlacesException, InvalidCredentialsException, AccountNotFoundException, DatabaseException, RepositoryException{
         //If amount is more than in the account, a negative number,a non number , has too many decimal places,throw error
+
         if(amount.compareTo(viewBalance(accountId)) > 0) {
             throw new InsufficientFundsException("The amount withdrawn cannot be more than the account balance.");
         } else if(amount.compareTo(BigDecimal.ZERO) < 0) {
@@ -121,6 +122,9 @@ public class Business {
         else if(!hasAtMostTwoDecimalPlaces(amount)){
             throw new MoreThanTwoDecimalPlacesException("There were too many decimal places provided.");
         }
+        BigDecimal total = viewBalance(accountId).subtract(amount);
+        Repository.updateBalance(accountId,total);
+
         return true;
     }
 
