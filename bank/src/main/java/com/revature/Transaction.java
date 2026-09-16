@@ -11,6 +11,7 @@ public class Transaction {
     // Saving amount to double, subject to change based on Damon/Ye
     private BigDecimal amount;
     private String relatedAccountId;
+    private String creationDate;
 
     //Constructor
 
@@ -37,6 +38,12 @@ public class Transaction {
         this.type = type;
         this.amount = amount;
         this.relatedAccountId = relatedAccountId;
+    }
+
+    public Transaction(String transactionId, String accountId, String type, BigDecimal amount, String relatedAccountId, String creationDate){
+        this(transactionId, accountId, type, amount, relatedAccountId);
+        this.creationDate = creationDate;
+
     }
 
 
@@ -81,4 +88,12 @@ public class Transaction {
     public void setRelatedAccountId(String relatedAccountId) {
         this.relatedAccountId = relatedAccountId;
     }
+
+    public String getCreationDate(){
+        return creationDate;
+    }
+    public void setCreationDate(String creationDate) {
+        this.creationDate = creationDate;
+    }
 }
+

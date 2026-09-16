@@ -88,8 +88,11 @@ public class API {
             Business.verifyCredentials(inputAccountID, inputPin);
             System.out.println(clearScreen);
             System.out.println("Login Successful!");
+            //TODO: will need to fix the discrepency with how we use local var accountID and pin with field variabel
+            //accountID and pin
             accountID = inputAccountID;
-            homeAccountPage(accountID);
+            pin = inputPin;
+            homeAccountPage(accountID, pin);
             return true;
         
     // I can catch now a general bank exception without needing to know 
@@ -108,7 +111,7 @@ public class API {
     // This will be the query loop where it will ask you what you want to do:
     // view balance, deposit, withdraw, transfer, or view activity
     // Damon
-    private void homeAccountPage(String accountID) {
+    private void homeAccountPage(String accountID, String pin) {
         // Another query loop with those 5 tasks
         // would we want these messages to print each time you get to this page?
         // in that case, if you return from any of the actions, maybe we should move these into the while loop?
@@ -150,7 +153,7 @@ public class API {
                     break;
                 case "v":
                     // same thing here
-                    transactionHistory(accountID);
+                    transactionHistory(accountID, pin);
                     break;
                 case "q":
                     // same thing here
@@ -266,13 +269,95 @@ public class API {
 
     //yousef
     // displays transaction activity from db
-    private void transactionHistory(String accountID) {
-        //temporarily adding info into transaction history
-        try{
-            String res = Business.validateTransactionHistory(accountID);
-            System.out.println(res);
-        } catch(BusinessException e) {
-            System.out.println("Error:" + e);
+    private void transactionHistory(String accountID, String pin) {
+        final int pageSize = 5;
+        try {
+            ArrayList<Transaction> res = Business.validateTransactionHistory(accountID, pin);
+            if (res.isEmpty()) {
+                System.out.println("History is empty");
+                return;
+            }
+            int page = 0;
+            boolean browsing = true;
+            while (browsing) {
+                System.out.print(clearScreen);
+                int start = page * pageSize;
+                int end = Math.min(start + pageSize, res.size());
+                System.out.println("Transaction History");
+                System.out.println("-------------------");
+                for (int i = start; i < end; i++) {
+                    Transaction transaction = res.get(i);
+                    switch (transaction.getType()) {
+                        case "DEPOSIT":
+                            System.out.println("Deposited $" + transaction.getAmount()
+                                    + " on " + transaction.getCreationDate());
+                            break;
+                        case "WITHDRAWAL":
+                            System.out.println("Withdrew $" + transaction.getAmount()
+                                    + " on " + transaction.getCreationDate());
+                            break;
+                        case "TRANSFER_IN":
+                            System.out.println("Received $" + transaction.getAmount()
+                                    + " from " + transaction.getRelatedAccountId()
+                                    + " on " + transaction.getCreationDate());
+                            break;
+                        case "TRANSFER_OUT":
+                            System.out.println("Transferred $" + transaction.getAmount()
+                                    + " to " + transaction.getRelatedAccountId()
+                                    + " on " + transaction.getCreationDate());
+                            break;
+                        default:
+                            System.out.println("Unknown transaction type: " + transaction.getType());
+                            break;
+                    }
+                }
+                int totalPages = (res.size() + pageSize - 1) / pageSize;
+                System.out.println("\nPage " + (page + 1) + " of " + totalPages);
+                System.out.println("[n] Next  [p] Previous  [q] Quit");
+                System.out.print(">>");
+                String command = s.nextLine().toLowerCase();
+                switch (command) {
+                    case "n":
+                        if (end < res.size()) {
+                            page++;
+                        } else {
+                            System.out.println();
+                            System.out.println();
+                            System.out.println("You are on the last page!");
+                            waitALittle(2);
+                        }
+                        break;
+                    case "p":
+                        if (page > 0) {
+                            page--;
+                        } else {
+                            System.out.println();
+                            System.out.println();
+                            System.out.println("You are on the first page.!");
+                            waitALittle(2);
+                        }
+                        break;
+                    case "q":
+                        browsing = false;
+                        break;
+                    default:
+                        System.out.println();
+                        System.out.println();
+                        System.out.println("Invalid option!");
+                        waitALittle(2);
+                        break;
+                }
+            }
+        } catch (BankException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    private void waitALittle(int seconds){
+        try {
+            TimeUnit.SECONDS.sleep(2);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
         }
     }
 
