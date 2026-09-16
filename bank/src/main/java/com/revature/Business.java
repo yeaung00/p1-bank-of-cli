@@ -111,7 +111,7 @@ public class Business {
     //maybe can create class reprenting a row of data then use a collections class like
     //Arraylist to store the data
     //ArrayList<Transaction> = new ArrayList<>();
-    public static ArrayList<Transaction> validateTransactionHistory(String accountID,String pin) throws InvalidCredentialsException, EmptyTransactionHistory, DatabaseException{
+    public static ArrayList<Transaction> validateTransactionHistory(String accountID,String pin) throws InvalidCredentialsException, EmptyTransactionHistoryException, DatabaseException{
         verifyCredentials(accountID, pin);
         return Repository.getTransactionHistory(accountID);
     }
