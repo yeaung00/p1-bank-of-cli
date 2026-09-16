@@ -38,7 +38,7 @@ public class BusinessTest {
     }
 
     @Test
-    @DisplayName ("w")
+    @DisplayName("validateTransactionHistory throws for an unsuccessful validation")
     void testUnsuccessfulValidateTransactionHistory() throws BankException{
         String accountId = "Billy";
         String pin = "1234";
