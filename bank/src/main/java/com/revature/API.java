@@ -82,12 +82,16 @@ public class API {
     private boolean login() {
         try {
             System.out.print("Welcome to the login screen. Please provide your Account ID: ");
-            String accountID = s.nextLine();
+            String inputAccountID = s.nextLine();
             System.out.print("\nPlease provide your PIN: ");
-            String pin = s.nextLine();
-            Business.verifyCredentials(accountID, pin);
+            String inputPin = s.nextLine();
+            Business.verifyCredentials(inputAccountID, inputPin);
             System.out.println(clearScreen);
             System.out.println("Login Successful!");
+            //TODO: will need to fix the discrepency with how we use local var accountID and pin with field variabel
+            //accountID and pin
+            accountID = inputAccountID;
+            pin = inputPin;
             homeAccountPage(accountID, pin);
             return true;
         
@@ -168,7 +172,7 @@ public class API {
     private void viewBalance() {
         System.out.println(clearScreen);
         try {
-            System.out.println("Your current balance is: " + Business.viewBalance(this.accountID));
+            System.out.println("Your current balance is: $" + Business.viewBalance(this.accountID));
         } catch (BankException e) {
             System.out.println(e.getMessage());
         }

@@ -81,9 +81,7 @@ public class Repository {
     // Might not even need this - Yousef
     public static BigDecimal getBalance(String accountID) throws AccountNotFoundException, DatabaseException {
         // assuming that accountID is unique
-        String query = "SELECT balance_cents" +
-                        "FROM accounts " +
-                        "WHERE account_id = ?";
+        String query = "SELECT balance_cents FROM accounts WHERE account_id = ?";
 
         try (
                 Connection conn = ConnectionFactory.getAutoCommitConnect();
@@ -109,13 +107,12 @@ public class Repository {
 
     // (updateBalance) Updates the value of balance during deposits and withdraws - Connor
     public static int updateBalance(String accountID, BigDecimal amount) throws RepositoryException {
-        String sqlQuery = "UPDATE accounts SET balance = ? where accountID = ?";
+        String query = "UPDATE accounts SET balance_cents = ? WHERE account_id = ?";
         try (
             Connection connection = ConnectionFactory.getAutoCommitConnect();
-            PreparedStatement ps = connection.prepareStatement(sqlQuery);
+            PreparedStatement ps = connection.prepareStatement(query)
         ) {
             int cents = MoneyUtils.dollarsToCents(amount);
-
             ps.setInt(1, cents);
             ps.setString(2, accountID);
             int rowsAffected = ps.executeUpdate();
@@ -124,7 +121,7 @@ public class Repository {
             }
             return rowsAffected;
         } catch (SQLException e) {
-            throw new TransactionFailedException("Could not carry out transaction. Please try again");
+            throw new TransactionFailedException("Could not carry out transaction. Please try again.");
         }
     }
 
