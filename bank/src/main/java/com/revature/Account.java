@@ -1,28 +1,30 @@
 package com.revature;
 
+import java.math.BigDecimal;
+
 public class Account {
-    private int accountId;
+    private String accountId;
     private String pin;
-    private double balance;
+    private BigDecimal balance;
     private String creationDate;
 
-    public Account(int accountId, String pin, double balance, String creationDate) {
+    public Account(String accountId, String pin, BigDecimal balance, String creationDate) {
         // redundant check that arguments are valid
-        if (accountId <= 0) {
+        if (accountId == null || accountId.isBlank()) {
             throw new IllegalArgumentException(
-                    "Account ID cannot be zero or negative"
+                    "Account ID cannot be null or empty"
             );
         }
 
         if (pin == null || pin.isBlank()) {
             throw new IllegalArgumentException(
-                    "PIN cannot be blank"
+                    "PIN cannot be null or empty"
             );
         }
 
-        if (balance < 0) {
+        if (balance == null || balance.compareTo(BigDecimal.ZERO) < 0) {
             throw new IllegalArgumentException(
-                    "Balance cannot be negative"
+                    "Balance cannot be null or negative"
             );
         }
 
@@ -32,15 +34,15 @@ public class Account {
         this.creationDate = creationDate;
     }
 
-    public Account(int accountId, String pin) {
-        this(accountId, pin, 0.0, null);
+    public Account(String accountId, String pin) {
+        this(accountId, pin, BigDecimal.ZERO, null);
     }
 
-    public int getAccountId() {
+    public String getAccountId() {
         return accountId;
     }
 
-    public void setAccountId(int accountId) {
+    public void setAccountId(String accountId) {
         this.accountId = accountId;
     }
 
@@ -60,14 +62,14 @@ public class Account {
         this.pin = pin;
     }
 
-    public double getBalance() {
+    public BigDecimal getBalance() {
         return balance;
     }
 
-    public void setBalance(double balance) {
+    public void setBalance(BigDecimal balance) {
         // redundant check if balance is valid
-        if (balance < 0) {
-            throw new IllegalArgumentException("Balance cannot be negative");
+        if (balance == null || balance.compareTo(BigDecimal.ZERO) < 0) {
+            throw new IllegalArgumentException("Balance cannot be null or negative");
         }
 
         this.balance = balance;

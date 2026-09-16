@@ -92,8 +92,6 @@ public class Business {
 
     // Checks if the transfer is valid (Does the other person have enough? Do you? Is the amount positive?) - Ye
     public static boolean validTransfer(String accountIDFrom, String accountIDTo, double amount) {
-        // Add exceptions once Yousef's branch on the new Exception design is merged
-        // call the repo layer to make db changes.
         return true;
     }
 
