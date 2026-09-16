@@ -1,5 +1,6 @@
 package com.revature;
 
+import java.sql.SQLException;
 import java.sql.SQLOutput;
 import java.util.*;
 
@@ -11,9 +12,8 @@ import java.util.concurrent.TimeUnit;
 public class API {
     // Attributes
     private Scanner s;
-    private String accountID;
+    private String accountId;
     private String pin;
-    private HashMap mockDB;
 
     private static String clearScreen = "\n\n\n\n\n";
 
@@ -60,18 +60,21 @@ public class API {
     // After you register, it should send you back to the launch to login
     // Ydur
     private void register() {
-        System.out.println("Please Enter your accountID: ");
-        accountID = s.nextLine();
+        //Grabs User input as info
+        System.out.println("Please Enter your accountId: ");
+        accountId = s.nextLine();
         System.out.println("Please Enter your PIN: ");
         pin = s.nextLine();
-        if(accountID.equals("Billy")){
-            System.out.println("This will check to see accountID is taken.");
-        }else if (accountID == null || accountID.isEmpty()){
-            System.out.println("This will check if it's empty.");
-//            System.out.println("Please enter an accountID.");
-        }else {
-//            mockDB.put(accountID,pin);
-            System.out.println("We would put it into the database");
+        //Sends it  Business layer to verify credentials
+        try {
+            if(Business.verifyRegistration(accountId,pin)){
+                System.out.println(accountId +"'s Account created Successfully!");
+            }
+
+        } catch (RuntimeException e) {
+            System.out.println("This account is taken.");
+        } catch (SQLException e){
+            System.out.println("The Database communication failed");
         }
     }
 
@@ -81,13 +84,13 @@ public class API {
     private boolean login() {
         try {
             System.out.print("Welcome to the login screen. Please provide your Account ID: ");
-            String accountID = s.nextLine();
+            String accountId = s.nextLine();
             System.out.print("\nPlease provide your PIN: ");
             String pin = s.nextLine();
-            Business.verifyCredentials(accountID, pin);
+            Business.verifyCredentials(accountId, pin);
             System.out.println(clearScreen);
             System.out.println("Login Successful!");
-            homeAccountPage(accountID);
+            homeAccountPage(accountId);
             return true;
         
     // I can catch now a general bank exception without needing to know 
@@ -106,12 +109,12 @@ public class API {
     // This will be the query loop where it will ask you what you want to do:
     // view balance, deposit, withdraw, transfer, or view activity
     // Damon
-    private void homeAccountPage(String accountID) {
+    private void homeAccountPage(String accountId) {
         // Another query loop with those 5 tasks
         // would we want these messages to print each time you get to this page?
         // in that case, if you return from any of the actions, maybe we should move these into the while loop?
         // same sort of reasoning with the text in launch()
-        System.out.println("Welcome " + accountID + " to your home page! What would you like to do?");
+        System.out.println("Welcome " + accountId + " to your home page! What would you like to do?");
 
         /*
             design choice between switch cases and if statements:
@@ -148,7 +151,7 @@ public class API {
                     break;
                 case "v":
                     // same thing here
-                    transactionHistory(accountID);
+                    transactionHistory(accountId);
                     break;
                 case "q":
                     // same thing here
@@ -167,7 +170,7 @@ public class API {
     private void viewBalance() {
         System.out.println(clearScreen);
         try {
-            System.out.println("Your current balance is: " + Business.viewBalance(this.accountID));
+            System.out.println("Your current balance is: " + Business.viewBalance(this.accountId));
         } catch (BankException e) {
             System.out.println(e.getMessage());
         }
@@ -186,7 +189,7 @@ public class API {
             String input = s.nextLine();
             try {
                 double amount = Double.parseDouble(input);
-                if (Business.validDeposit(accountID, amount)) {
+                if (Business.validDeposit(accountId, amount)) {
                     System.out.print("You've deposited $" + amount + ". Thank you!\nRedirecting to home screen...\n");
 
                     // Wait 3 seconds to clear the terminal and redirect to home screen
@@ -229,7 +232,7 @@ public class API {
                 double amount = Double.parseDouble(input);
                 try{
                     //Business Layer - Call a  func to validate withdraw amount
-                    Business.validWithdraw(accountID,amount);
+                    Business.validWithdraw(accountId,amount);
                     System.out.println(clearScreen);
                     System.out.println("$"+ amount + " has been successfully withdrawn from your account.");
                 }
@@ -264,10 +267,10 @@ public class API {
 
     //yousef
     // displays transaction activity from db
-    private void transactionHistory(String accountID) {
+    private void transactionHistory(String accountId) {
         //temporarily adding info into transaction history
         try{
-            String res = Business.validateTransactionHistory(accountID);
+            String res = Business.validateTransactionHistory(accountId);
             System.out.println(res);
         } catch(BusinessException e) {
             System.out.println("Error:" + e);

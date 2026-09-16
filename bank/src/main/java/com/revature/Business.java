@@ -4,11 +4,35 @@ import com.revature.exceptions.*;
 import com.revature.exceptions.customexceptions.*;
 
 import java.math.BigDecimal;
+import java.sql.SQLException;
 
 public class Business {
     // Ydur
-    public static boolean verifyRegistration(String accountID) {
+    //accountId should be 10 chars, maybe pin can be verified aswell later
+
+    public static boolean verifyRegistration(String accountId,String pin) throws RuntimeException, SQLException {
+        //Checks if the length of the name is long enough for an account to be created
+        if(accountId.length() > 10 ){
+            throw new RuntimeException("Account Id is too long!");
+        }
+        //If check passes, Passes to Repository layer to checkExistingAccounts() & will addAccount if it passes
+        try {
+            //If checkExistingAccounts returns false meaning no records with that account exist, run addAccount
+            if(!Repository.checkExistingAccounts(accountId)){
+                Repository.addAccount(accountId,pin);
+            }
+            else{
+                throw new RuntimeException();
+            }
+        }
+        catch (DatabaseException e) {
+            throw new RuntimeException(e);
+        }
+        catch (SQLException e){
+            throw new RuntimeException(e);
+        }
         return true;
+
     }
 
     // Yousef

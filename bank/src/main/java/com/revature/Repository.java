@@ -1,9 +1,6 @@
 package com.revature;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.PreparedStatement;
+import java.sql.*;
 
 import com.revature.utility.ConnectionFactory;
 import com.revature.exceptions.RepositoryException;
@@ -13,9 +10,40 @@ import com.revature.exceptions.customexceptions.*;
 
 public class Repository {
     // Adds a new account after a user registers - Ydur
-    public static void addAccount() {
+    public static void addAccount(String accountId,String pin) throws SQLException{
+        //Creating Query
+        String query = "insert into accounts (account_id, pin_hash) " +
+                "values(?, ?)";
+        try(
+                //Creating connection using connection factory with autocommit method
+                Connection connection = ConnectionFactory.getAutoCommitConnect();
+                //Plug the query into the connection's prepared statement method & fill in placeholders(Also keeping connection adn stmnt in try-with-resources)
+                PreparedStatement statement = connection.prepareStatement(query)){
+            statement.setString(1,accountId);
+            statement.setString(2,pin);
 
+            //execute query
+            statement.executeUpdate();
+        }
+        catch (SQLException e){
+            throw new SQLException("Unable to communicate with the database to verify registration");
+        }
     }
+
+    public static boolean checkExistingAccounts(String accountId) throws DatabaseException{
+        String query = "SELECT account_id FROM accounts WHERE account_id = ?";
+        try(Connection connection = ConnectionFactory.getAutoCommitConnect()){
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.setString(1, accountId);
+            ResultSet res = statement.executeQuery();
+
+            return res.next();
+        }
+        catch (SQLException e){
+            throw new DatabaseException("Database error during Account retrieval: ", e);
+        }
+    }
+
 
     // Gets the accountID and PIN to verify the credentials when logging in - Yousef
     public static Account getAccount(String AccountID, String pin) throws AccountNotFoundException, DatabaseException {
