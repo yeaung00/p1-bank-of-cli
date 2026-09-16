@@ -206,6 +206,7 @@ public class API {
                     } catch (InterruptedException e) {
                         Thread.currentThread().interrupt();
                     }
+                    logger.info("Deposit SUCCESS: User " + accountID + " deposited $" + amount.toString() + ".");
                     break;
                 }
                 // Would need to move this somewhere later
@@ -215,6 +216,7 @@ public class API {
                     System.out.print(clearScreen);
                     break;
                 } else {
+                    logger.error("Deposit screen ERROR: User " + accountID + " inputted deposit amount in wrong format.");
                     System.out.println("Invalid input. Please try again.");
                 }
             } catch (BusinessException e) {
