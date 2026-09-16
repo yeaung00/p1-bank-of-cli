@@ -4,6 +4,7 @@ import com.revature.exceptions.*;
 import com.revature.exceptions.customexceptions.*;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -110,14 +111,8 @@ public class Business {
     //maybe can create class reprenting a row of data then use a collections class like
     //Arraylist to store the data
     //ArrayList<Transaction> = new ArrayList<>();
-    public static String validateTransactionHistory(String accountID) throws EmptyTransactionActivityException{
-        // just testing full logic flow, we would call a method(like getTransactionActivity()) in repository layer here that fetches
-        // transaction activity
-        if(accountID.equals("Billy")) {
-            return "here we would return data from db";
-        }
-        else {
-            throw new EmptyTransactionActivityException("No transaction activity found for account: " + accountID);
-        }
+    public static ArrayList<Transaction> validateTransactionHistory(String accountID,String pin) throws InvalidCredentialsException, EmptyTransactionHistoryException, DatabaseException{
+        verifyCredentials(accountID, pin);
+        return Repository.getTransactionHistory(accountID);
     }
 }

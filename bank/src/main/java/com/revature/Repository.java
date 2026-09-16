@@ -10,6 +10,7 @@ import com.revature.exceptions.RepositoryException;
 import com.revature.exceptions.*;
 import com.revature.exceptions.customexceptions.*;
 
+import java.util.ArrayList;
 import com.revature.utility.ConnectionFactory;
 import com.revature.utility.MoneyUtils;
 
@@ -140,7 +141,35 @@ public class Repository {
     }
 
     // Retrieves the tranactions for an associated accountID - Yousef
-    public static void viewTransactionHistory() {
+    public static ArrayList<Transaction> getTransactionHistory(String accountID) throws EmptyTransactionHistoryException, DatabaseException {
+        //TODO: I will need to go back and then order by creationDate asc in order to get the transaction history in order
+        String query = "SELECT * FROM transactions t WHERE t.account_id = ?";
+        ArrayList<Transaction> out = new ArrayList<>();
+        try(   
+            Connection connection = ConnectionFactory.getAutoCommitConnect();
+            PreparedStatement statement = connection.prepareStatement(query);
+        ) {
+            statement.setString(1, accountID);
+            try (ResultSet res = statement.executeQuery()) {
+                while(res.next()) {
+                    String accID = res.getString("account_id");
+                    String tType = res.getString("transaction_type");
+                    int cents = res.getInt("amount_cents");
+                    BigDecimal dollars = MoneyUtils.centsToDollars(cents);
+                    String relID = res.getString("related_account_id");
+                    String cDate = res.getString("creationDate");
 
+                    //TODO: We should not be storing transaction_id in Transaction class b/c that is handled in db side
+                    //for now, we put placeover text for it until its deleted
+                    out.add(new Transaction("placeholder", accID, tType, dollars, relID, cDate));
+                }
+                if(out.size() == 0) {
+                    throw new EmptyTransactionHistoryException("No transaction history found for account: " + accountID);
+                }
+                return out;
+            }
+        } catch (SQLException e) {
+            throw new DatabaseException("Database error during Transaction retrieval: ", e);
+        }
     }
 }
