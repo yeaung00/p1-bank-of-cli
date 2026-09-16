@@ -22,9 +22,9 @@ public class Account {
             );
         }
 
-        if (balance.compareTo(BigDecimal.ZERO) < 0) {
+        if (balance == null || balance.compareTo(BigDecimal.ZERO) < 0) {
             throw new IllegalArgumentException(
-                    "Balance cannot be negative"
+                    "Balance cannot be null or negative"
             );
         }
 
@@ -68,8 +68,8 @@ public class Account {
 
     public void setBalance(BigDecimal balance) {
         // redundant check if balance is valid
-        if (balance.compareTo(BigDecimal.ZERO) < 0) {
-            throw new IllegalArgumentException("Balance cannot be negative");
+        if (balance == null || balance.compareTo(BigDecimal.ZERO) < 0) {
+            throw new IllegalArgumentException("Balance cannot be null or negative");
         }
 
         this.balance = balance;

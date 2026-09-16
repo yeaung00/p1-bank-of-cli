@@ -1,5 +1,6 @@
 package com.revature;
 
+import java.math.BigDecimal;
 import java.sql.SQLOutput;
 import java.util.*;
 
@@ -185,7 +186,7 @@ public class API {
             System.out.print("$");
             String input = s.nextLine();
             try {
-                double amount = Double.parseDouble(input);
+                BigDecimal amount = new BigDecimal(input.trim());
                 if (Business.validDeposit(accountID, amount)) {
                     System.out.print("You've deposited $" + amount + ". Thank you!\nRedirecting to home screen...\n");
 
@@ -226,10 +227,10 @@ public class API {
             System.out.print("$");
             String input = s.nextLine();
             try{
-                double amount = Double.parseDouble(input);
+                BigDecimal amount = new BigDecimal(input.trim());
                 try{
                     //Business Layer - Call a  func to validate withdraw amount
-                    Business.validWithdraw(accountID,amount);
+                    Business.validWithdraw(accountID, amount);
                     System.out.println(clearScreen);
                     System.out.println("$"+ amount + " has been successfully withdrawn from your account.");
                 }
@@ -254,9 +255,9 @@ public class API {
     // Ye
     private void transfer() {
         System.out.println("Please input the account ID you'd like to transfer to.");
-        String  toId = s.nextLine();
+        String toId = s.nextLine();
         System.out.println("Please input transfer amount.");
-        double amount = Double.parseDouble(s.nextLine());
+        BigDecimal amount = new BigDecimal(s.nextLine().trim());
         // Business Layer validates transaction
         // Business.transfer(fromId, toId, amount)
         System.out.println("You've transferred $" + amount + " to " + toId + ".");
