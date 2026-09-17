@@ -69,6 +69,7 @@ public class BusinessTest {
             mockRepository.verify(() -> Repository.getAccount(accountId, pin));
         }
     }
+
     @Test
     @DisplayName("verifyCredentials throws for invalid credentials")
     void testInvalidCredentials() {
@@ -85,11 +86,10 @@ public class BusinessTest {
         }
     }
 
-    // this test entirely depends on the state of your database, I'm currently working on normalizing the test
-    // database to keep everything consistent
     @Test
+    @DisplayName("viewBalance returns true for an existing account")
     void testViewBalance() throws BankException {
-        BigDecimal expectedBalance = new BigDecimal(0);
+        BigDecimal expectedBalance = new BigDecimal("1.00");
 
         try (MockedStatic<Repository> repo = Mockito.mockStatic(Repository.class)) {
             repo.when(() -> Repository.getBalance("Billy")).thenReturn(expectedBalance);
@@ -97,5 +97,17 @@ public class BusinessTest {
 
         BigDecimal actualBalance = Business.viewBalance("Billy");
         assertEquals(0, actualBalance.compareTo(expectedBalance));
+    }
+
+    @Test
+    @DisplayName("viewBalance returns false for a non-existing account")
+    void testInvalidViewBalance() throws BankException {
+        try (MockedStatic<Repository> repo = Mockito.mockStatic(Repository.class)) {
+            repo.when(() -> Repository.getBalance("Non-existing")).thenThrow(new AccountNotFoundException("Account not found"));
+        }
+        assertThrows(
+                BusinessException.class,
+                () -> Business.viewBalance("Non-existing")
+        );
     }
 }

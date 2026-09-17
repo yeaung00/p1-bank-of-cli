@@ -27,10 +27,20 @@ public class RepositoryTest {
     }
 
     @Test
+    @DisplayName("getBalance returns true for an existing account")
     void testGetBalance() throws AccountNotFoundException, DatabaseException {
         BigDecimal balance = Repository.getBalance("Billy");
 
         assertEquals(0, balance.compareTo(new BigDecimal("1.00")));
+    }
+
+    @Test
+    @DisplayName("getBalance returns false for a non-existing account")
+    void testGetBalanceNonExisting() {
+        assertThrows(
+                AccountNotFoundException.class,
+                () -> Repository.getBalance("NonExistent")
+        );
     }
 
     @AfterEach
