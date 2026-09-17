@@ -86,6 +86,7 @@ public class Repository {
                 if(res.next()) {
                     resAccountID = res.getString("account_id");
                     resPin = res.getString("pin_hash");
+                    logger.info("Account successfuly found with AccountID" + AccountID + "and pin " + pin);
                     return new Account(resAccountID,resPin);
                 }
                 else {
@@ -99,25 +100,30 @@ public class Repository {
                     boolean hasCorrectPin = resP.next();
                     checkAccID.close();
                     checkPin.close();
+                    resAccID.close();
+                    resP.close();
                     // this is where we would log to the debugger which credential was not correct.
                     //it is important to not pass this logging down to the console as
                     //this is information only we the developers should be able to see
                     if(!hasCorrectAcc && hasCorrectPin) {
-                        throw new AccountNotFoundException("No record contains the Account ID " + AccountID + " in the accounts table.");
+                        logger.debug("No record contains the Account ID " + AccountID + " in the accounts table.");
                     }
                     else if (!hasCorrectPin && hasCorrectAcc) {
-                        throw new AccountNotFoundException("No record contains the pin " + pin + " in the accounts table");
+                        logger.debug("No record contains the pin " + pin + " in the accounts table");
                     }
                     else {
-                        throw new AccountNotFoundException("No record contains the Account ID " + AccountID +
+                        logger.debug("No record contains the Account ID " + AccountID +
                                                             " nor does any record contain the pin " + pin +
                                                             " in the accounts table");
-                    }
 
+                    }
+                    throw new AccountNotFoundException("No account with specified credentials was found");
                 }
 
         } catch(SQLException e) {
-           throw new DatabaseException("Database error during Account retrieval: ", e);
+            //moving actual error message to log file, and general exception down to user
+            logger.error(e.getMessage());
+           throw new DatabaseException("Database error during Account retrieval: ");
         }
     }
 
@@ -239,12 +245,16 @@ public class Repository {
                     out.add(new Transaction("placeholder", accID, tType, dollars, relID, cDate));
                 }
                 if(out.size() == 0) {
-                    throw new EmptyTransactionHistoryException("No transaction history found for account: " + accountID);
+                    logger.error("No transaction history found for account: " + accountID);
+                    throw new EmptyTransactionHistoryException("No transaction history found");
                 }
+                logger.info("Transaction history successfuly found with accountID " + accountID 
+                            + ". History size is " + out.size() + " transactions.");
                 return out;
             }
         } catch (SQLException e) {
-            throw new DatabaseException("Database error during Transaction retrieval: ", e);
+            logger.error(e.getMessage());
+            throw new DatabaseException("Database error during Transaction retrieval");
         }
     }
 }

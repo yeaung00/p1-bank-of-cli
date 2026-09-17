@@ -51,8 +51,9 @@ public class Business {
             return(res.getAccountId().equals(accountId) && res.getPin().equals(pin));
 
         } catch (RepositoryException e) {
+            //these general exceptions is what the user will see
             if (e instanceof AccountNotFoundException) {
-                throw new InvalidCredentialsException("Invalid Account ID or PIN", e);
+                throw new InvalidCredentialsException("Invalid Account ID or PIN");
             }
             if (e instanceof DatabaseException databaseException) {
                 throw databaseException;

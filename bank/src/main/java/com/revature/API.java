@@ -108,12 +108,8 @@ public class API {
     // I can catch now a general bank exception without needing to know 
     // exactly which one the business layer will throw
         } catch (BankException e) {
-            // instead of printing to console, e will contain very sensitive information/ internal details
-            // so we must instead log this information into the logger
-            e.printStackTrace();
-            // two outcomes: either db failed to process request
-            // or Credentials given did not match any records in the db
-            // use .getMessage() to print the exception string
+            // we only print general information on the error, not intrinsic details
+            System.out.println(e.getMessage());
             return false;
         }
     }
