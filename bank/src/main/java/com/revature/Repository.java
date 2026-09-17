@@ -166,13 +166,47 @@ public class Repository {
     }
 
     // Perform manualCommitConnect() and facilitate a transfer - Ye
-    public static void transfer(String accountFrom, String accountTo, double amount) {
-
+    public static void transfer(String accountFrom, String accountTo, BigDecimal amount) throws RepositoryException {
+        String debitSql = "UPDATE accounts SET balance_cents = balance_cents - ? WHERE account_id = ? AND balance_cents >= ?";
+        String creditSql = "UPDATE accounts SET balance_cents = balance_cents + ? WHERE account_id = ?";
+        int cents = MoneyUtils.dollarsToCents(amount);
+        try (Connection connection = ConnectionFactory.getManualCommitConnection()) {
+            try (PreparedStatement creditStatement = connection.prepareStatement(creditSql);
+                 PreparedStatement debitStatement = connection.prepareStatement(debitSql)) {
+                debitStatement.setInt(1, cents);
+                debitStatement.setString(2, accountFrom);
+                debitStatement.setInt(3, cents);
+                if (debitStatement.executeUpdate() != 1) {
+                    throw new TransactionFailedException("Transfer failed. Missing account or balance too low.");
+                }
+                creditStatement.setInt(1, cents);
+                creditStatement.setString(2, accountTo);
+                if (creditStatement.executeUpdate() != 1) {
+                    throw new AccountNotFoundException("Transfer failed: recipient " + accountTo + " not found.");
+                }
+                addTransaction(connection, accountFrom, "TRANSFER_OUT", cents, accountTo);
+                addTransaction(connection, accountTo, "TRANSFER_IN", cents, accountFrom);
+                connection.commit();
+            } catch (RepositoryException | SQLException e) {
+                connection.rollback();
+                throw e;
+            }
+        } catch (SQLException e) {
+            throw new DatabaseException("Database error during transfer", e);
+        }
     }
 
     // Adds a transaction for an associated accountID - Ye
-    public static void addTransaction() {
+    public static void addTransaction(Connection connection, String accountID, String type, int amountCents, String relatedAccountID) throws SQLException {
+        String insertTransactionsSql = "INSERT INTO transactions (account_id, transaction_type, amount_cents, related_account_id) " + "VALUES (?, ?, ?, ?)";
 
+        try (PreparedStatement statement = connection.prepareStatement(insertTransactionsSql)) {
+            statement.setString(1, accountID);
+            statement.setString(2, type);
+            statement.setInt(3, amountCents);
+            statement.setString(4, relatedAccountID);
+            statement.executeUpdate();
+        }
     }
 
     // Retrieves the tranactions for an associated accountID - Yousef

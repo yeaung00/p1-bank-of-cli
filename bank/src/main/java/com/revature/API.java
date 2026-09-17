@@ -266,12 +266,17 @@ public class API {
     // Ye
     private void transfer() {
         System.out.println("Please input the account ID you'd like to transfer to.");
-        String toId = s.nextLine();
+        String toID = s.nextLine();
         System.out.println("Please input transfer amount.");
-        BigDecimal amount = new BigDecimal(s.nextLine().trim());
-        // Business Layer validates transaction
-        // Business.transfer(fromId, toId, amount)
-        System.out.println("You've transferred $" + amount + " to " + toId + ".");
+        try {
+            BigDecimal amount = new BigDecimal(s.nextLine().trim());
+            Business.validTransfer(accountID, toID, amount);
+            System.out.println("You've transferred $" + amount + " to " + toID + ".");
+        } catch (NumberFormatException e) {
+            System.out.println("Please enter a valid numeric value.");
+        } catch (BankException e) {
+            System.out.println("Transfer failed: " + e.getMessage());
+        }
     }
 
     //yousef

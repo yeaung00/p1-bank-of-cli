@@ -131,7 +131,17 @@ public class Business {
     }
 
     // Checks if the transfer is valid (Does the other person have enough? Do you? Is the amount positive?) - Ye
-    public static boolean validTransfer(String accountIdFrom, String accountIdTo, BigDecimal amount) {
+    public static boolean validTransfer(String accountIDFrom, String accountIDTo, BigDecimal amount) throws BusinessException, RepositoryException {
+        if (amount.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new NegativeInputException("Transfer amount must be greather than zero.");
+        } else if (!hasAtMostTwoDecimalPlaces(amount)) {
+            throw new MoreThanTwoDecimalPlacesException("The amount cannot have more than two decimal places.");
+        } else if (accountIDFrom.equals(accountIDTo)) {
+            throw new InvalidCredentialsException("You cannot transfer to your own account");
+        } else if (amount.compareTo(viewBalance(accountIDFrom)) > 0) {
+            throw new InsufficientFundsException("The transfer amount cannot be more than your balance.");
+        }
+        Repository.transfer(accountIDFrom, accountIDTo, amount);
         return true;
     }
 
