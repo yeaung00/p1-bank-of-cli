@@ -163,6 +163,7 @@ public class Repository {
             statement.setString(1, accountID);
             statement.setString(2, type);
             statement.setInt(3, amountCents);
+            statement.setString(4, relatedAccountID);
             statement.executeUpdate();
         }
     }
