@@ -100,4 +100,40 @@ public class APITest {
         }
     }
     */
+
+    //---------------------Ydur---------------------------------
+    //------Register
+    @Test
+    void registerPos(){
+
+    }
+
+
+
+    @Test
+    void checkExistingAccountPos(){
+
+    }
+
+    @Test
+    void addAccountPos(){
+
+    }
+
+
+    //------Withdraw
+
+
+
+    @Test
+    void withdrawPos(){
+
+    }
+
+    @Test
+    void validWithdrawPos(){
+
+    }
+
+
 }
