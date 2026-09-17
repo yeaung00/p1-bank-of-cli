@@ -274,11 +274,13 @@ public class API {
         System.out.println("Please input transfer amount.");
         try {
             BigDecimal amount = new BigDecimal(s.nextLine().trim());
+            logger.info("Transfer requested by {} to {} for {}", accountId, toID, amount);
             Business.validTransfer(accountId, toID, amount);
             System.out.println("You've transferred $" + amount + " to " + toID + ".");
         } catch (NumberFormatException e) {
             System.out.println("Please enter a valid numeric value.");
         } catch (BankException e) {
+            logger.warn("Transfer from {} failed: {}", accountId, e.getMessage(), e);
             System.out.println("Transfer failed: " + e.getMessage());
         }
     }
