@@ -84,4 +84,33 @@ public class BusinessTest {
             );
         }
     }
+//============================================Ydur's Tests===================
+
+    @Test
+    void verifyRegistrationPos() throws AccountNotFoundException, DatabaseException {
+        BigDecimal balance = Repository.getBalance("Billy");
+
+        assertEquals(0, balance.compareTo(new BigDecimal("1.00")));
+    }
+
+    @Test
+    void verifyRegistrationNeg() throws AccountNotFoundException, DatabaseException {
+        BigDecimal balance = Repository.getBalance("Billy");
+
+        assertEquals(0, balance.compareTo(new BigDecimal("1.00")));
+    }
+
+    @Test
+    void validWithdrawPos() throws AccountNotFoundException, DatabaseException {
+        BigDecimal balance = Repository.getBalance("Billy");
+
+        assertEquals(0, balance.compareTo(new BigDecimal("1.00")));
+    }
+
+    @Test
+    void validWithdrawNeg() throws AccountNotFoundException, DatabaseException {
+        BigDecimal balance = Repository.getBalance("Billy");
+
+        assertEquals(0, balance.compareTo(new BigDecimal("1.00")));
+    }
 }

@@ -37,4 +37,33 @@ public class RepositoryTest {
     void clearDatabase() throws Exception {
         TestDatabaseHelper.clearDatabase();
     }
+
+    @Test
+    void addAccountPos() throws AccountNotFoundException, DatabaseException {
+        BigDecimal balance = Repository.getBalance("Billy");
+
+        assertEquals(0, balance.compareTo(new BigDecimal("1.00")));
+    }
+
+    @Test
+    void addAccountNeg() throws AccountNotFoundException, DatabaseException {
+        BigDecimal balance = Repository.getBalance("Billy");
+
+        assertEquals(0, balance.compareTo(new BigDecimal("1.00")));
+    }
+
+
+    @Test
+    void checkExistingAccountPos() throws AccountNotFoundException, DatabaseException {
+        BigDecimal balance = Repository.getBalance("Billy");
+
+        assertEquals(0, balance.compareTo(new BigDecimal("1.00")));
+    }
+
+    @Test
+    void checkExistingAccountNeg() throws AccountNotFoundException, DatabaseException {
+        BigDecimal balance = Repository.getBalance("Billy");
+
+        assertEquals(0, balance.compareTo(new BigDecimal("1.00")));
+    }
 }
