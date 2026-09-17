@@ -20,17 +20,21 @@ public class Business {
     public static boolean verifyRegistration(String accountId,String pin) throws InvalidCredentialsException {
         //Checks if the length of the name is long enough for an account to be created
         if(accountId.length() > 10 ){
+            logger.info("User entered an accountId that exceeds 10 characters");
             throw new InvalidCredentialsException("Account Id is too long!");
         }
         //If check passes, Passes to Repository layer to checkExistingAccounts() & will addAccount if it passes
         try {
             //If checkExistingAccounts returns false meaning no records with that account exist, run addAccount
+            logger.info("Sending to Repository layer to check for existing records of {}", accountId);
             if(!Repository.checkExistingAccounts(accountId)){
+                logger.info("No results found, Contacting Repository to add {} to the Database...",accountId);
                 Repository.addAccount(accountId,pin);
             }else{
                 return false;
             }
         } catch (DatabaseException e) {
+            logger.info("Repository failed to add {} to the Database", accountId);
             throw new InvalidCredentialsException("There was an issue communicating wih the Database: ",e);
         }
         return true;
@@ -111,16 +115,20 @@ public class Business {
 
 
         if(amount.compareTo(viewBalance(accountId)) > 0) {
+            logger.info("{} attempted to withdraw more than their balance holds.", accountId);
             throw new InsufficientFundsException("The amount withdrawn cannot be more than the account balance.");
         } else if(amount.compareTo(BigDecimal.ZERO) < 0) {
+            logger.info("{} Attempted to withdraw a negative amount", accountId);
             throw new NegativeInputException("Unable to withdraw a negative amount.");
         }
         else if(!hasAtMostTwoDecimalPlaces(amount)){
+            logger.info("{} Attempted to input too many decimal places", accountId);
             throw new MoreThanTwoDecimalPlacesException("There were too many decimal places provided.");
         }
 
         try {
             BigDecimal total = viewBalance(accountId).subtract(amount);
+            logger.info("Sending to Repository layer to update balance");
             Repository.updateBalance(accountId,total);
         } catch (InvalidCredentialsException | RepositoryException e) {
             throw new RuntimeException(e);

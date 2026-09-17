@@ -37,8 +37,10 @@ public class Repository {
 
             //execute query
             statement.executeUpdate();
+            logger.info("Repository: No Entry found. Committing {} to Database",accountId);
         }
         catch (SQLException e){
+            logger.info("Repository: An error occured while committing {} to DB.",accountId);
             throw new DatabaseException("Unable to communicate with the database to verify registration",e);
         }
     }
@@ -51,10 +53,12 @@ public class Repository {
             PreparedStatement statement = connection.prepareStatement(query);
             statement.setString(1, accountId);
             ResultSet res = statement.executeQuery();
+            logger.info("Repository: Searching DB for {}...",accountId);
 
             return res.next();
         }
         catch (SQLException e){
+            logger.info("Repository: Found matching entry in DB",accountId);
             throw new DatabaseException("Database error during Account retrieval: ",e);
         }
     }

@@ -73,12 +73,15 @@ public class API {
         pin = s.nextLine();
         //Sends it  Business layer to verify credentials
         try {
+            logger.info("Sending to Business layer to verifyCredentials..");
             if(Business.verifyRegistration(accountId,pin)){
+                logger.info("An account was created for {}",accountId);
                 System.out.println(accountId +"'s Account created Successfully!");
             }else{
                 System.out.println("This account is taken.");
             }
         } catch (InvalidCredentialsException e){
+            logger.info("An account failed to be created for {}.",accountId,e);
             System.out.println("The Database communication failed");
         }
     }
@@ -240,12 +243,15 @@ public class API {
             try{
                 BigDecimal amount = new BigDecimal(input.trim());
                 try{
+                    logger.info("Sending to the Business layer to validate the withdraw...");
                     //Business Layer - Call a  func to validate withdraw amount
                     Business.validWithdraw(accountId, amount);
+                    logger.info("Successfully withdrew {} from {}",amount,accountId);
                     System.out.println(clearScreen);
                     System.out.println("$"+ amount + " has been successfully withdrawn from your account.");
                 }
                 catch (RuntimeException | BankException e){
+                    logger.info("Failed to withdraw {} from {}", amount,accountId);
                     System.out.println(clearScreen);
                     System.out.println("Withdrawal failed due to: " + e);
                 }
