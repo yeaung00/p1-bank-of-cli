@@ -81,10 +81,10 @@ public class Business {
     public static boolean validDeposit(String accountId, BigDecimal amount) throws BusinessException, RepositoryException {
         // If the amount is negative, it is not a valid deposit
         if (amount.compareTo(BigDecimal.ZERO) < 0) {
-            logger.error("validDeposit ERROR: User " + accountID + " tried to deposit negative amount.");
+            logger.error("validDeposit ERROR: User " + accountId + " tried to deposit negative amount.");
             throw new NegativeInputException("You cannot input a negative amount to deposit. Please try again");
         } else if (!hasAtMostTwoDecimalPlaces(amount)) {
-            logger.error("validDeposit ERROR: User " + accountID + " tried to deposit amount with more than two decimal places.");
+            logger.error("validDeposit ERROR: User " + accountId + " tried to deposit amount with more than two decimal places.");
             throw new MoreThanTwoDecimalPlacesException("The amount cannot have more than two decimal places. Please try again.");
         }
 

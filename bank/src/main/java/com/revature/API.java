@@ -208,7 +208,7 @@ public class API {
                     } catch (InterruptedException e) {
                         Thread.currentThread().interrupt();
                     }
-                    logger.info("Deposit SUCCESS: User " + accountID + " deposited $" + amount.toString() + ".");
+                    logger.info("Deposit SUCCESS: User " + accountId + " deposited $" + amount.toString() + ".");
                     break;
                 }
                 // Would need to move this somewhere later
@@ -218,7 +218,7 @@ public class API {
                     System.out.print(clearScreen);
                     break;
                 } else {
-                    logger.error("Deposit screen ERROR: User " + accountID + " inputted deposit amount in wrong format.");
+                    logger.error("Deposit screen ERROR: User " + accountId + " inputted deposit amount in wrong format.");
                     System.out.println("Invalid input. Please try again.");
                 }
             } catch (BusinessException e) {
@@ -272,7 +272,7 @@ public class API {
         System.out.println("Please input transfer amount.");
         try {
             BigDecimal amount = new BigDecimal(s.nextLine().trim());
-            Business.validTransfer(accountID, toID, amount);
+            Business.validTransfer(accountId, toID, amount);
             System.out.println("You've transferred $" + amount + " to " + toID + ".");
         } catch (NumberFormatException e) {
             System.out.println("Please enter a valid numeric value.");

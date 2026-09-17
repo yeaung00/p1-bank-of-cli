@@ -157,12 +157,12 @@ public class Repository {
             ps.setString(2, accountId);
             int rowsAffected = ps.executeUpdate();
             if (rowsAffected != 1) {
-                logger.error("updateBalance ERROR: User " + accountID + " failed to deposit " + amount.toString() + ".");
+                logger.error("updateBalance ERROR: User " + accountId + " failed to deposit " + amount.toString() + ".");
                 throw new TransactionFailedException("Could not carry out transaction. Please try again.");
             }
             return rowsAffected;
         } catch (SQLException e) {
-            logger.error("updateBalance ERROR: User " + accountID + " failed to deposit " + amount.toString() + ".");
+            logger.error("updateBalance ERROR: User " + accountId + " failed to deposit " + amount.toString() + ".");
             throw new TransactionFailedException("Could not carry out transaction. Please try again.");
         }
     }
