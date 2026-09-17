@@ -1,6 +1,7 @@
 package com.revature;
 
 import java.math.BigDecimal;
+import java.sql.SQLException;
 import java.sql.SQLOutput;
 import java.util.*;
 
@@ -15,9 +16,8 @@ import java.util.concurrent.TimeUnit;
 public class API {
     // Attributes
     private Scanner s;
-    private String accountID;
+    private String accountId;
     private String pin;
-    private HashMap mockDB;
 
     private static String clearScreen = "\n\n\n\n\n";
 
@@ -66,18 +66,20 @@ public class API {
     // After you register, it should send you back to the launch to login
     // Ydur
     private void register() {
-        System.out.println("Please Enter your accountID: ");
-        accountID = s.nextLine();
+        //Grabs User input as info
+        System.out.println("Please Enter your accountId: ");
+        accountId = s.nextLine();
         System.out.println("Please Enter your PIN: ");
         pin = s.nextLine();
-        if(accountID.equals("Billy")){
-            System.out.println("This will check to see accountID is taken.");
-        }else if (accountID == null || accountID.isEmpty()){
-            System.out.println("This will check if it's empty.");
-//            System.out.println("Please enter an accountID.");
-        }else {
-//            mockDB.put(accountID,pin);
-            System.out.println("We would put it into the database");
+        //Sends it  Business layer to verify credentials
+        try {
+            if(Business.verifyRegistration(accountId,pin)){
+                System.out.println(accountId +"'s Account created Successfully!");
+            }else{
+                System.out.println("This account is taken.");
+            }
+        } catch (InvalidCredentialsException e){
+            System.out.println("The Database communication failed");
         }
     }
 
@@ -87,17 +89,17 @@ public class API {
     private boolean login() {
         try {
             System.out.print("Welcome to the login screen. Please provide your Account ID: ");
-            String inputAccountID = s.nextLine();
+            String inputAccountId = s.nextLine();
             System.out.print("\nPlease provide your PIN: ");
             String inputPin = s.nextLine();
-            Business.verifyCredentials(inputAccountID, inputPin);
+            Business.verifyCredentials(inputAccountId, inputPin);
             System.out.println(clearScreen);
             System.out.println("Login Successful!");
             //TODO: will need to fix the discrepency with how we use local var accountID and pin with field variabel
             //accountID and pin
-            accountID = inputAccountID;
+            accountId = inputAccountId;
             pin = inputPin;
-            homeAccountPage(accountID, pin);
+            homeAccountPage(accountId, pin);
             return true;
         
     // I can catch now a general bank exception without needing to know 
@@ -116,12 +118,12 @@ public class API {
     // This will be the query loop where it will ask you what you want to do:
     // view balance, deposit, withdraw, transfer, or view activity
     // Damon
-    private void homeAccountPage(String accountID, String pin) {
+    private void homeAccountPage(String accountId, String pin) {
         // Another query loop with those 5 tasks
         // would we want these messages to print each time you get to this page?
         // in that case, if you return from any of the actions, maybe we should move these into the while loop?
         // same sort of reasoning with the text in launch()
-        System.out.println("Welcome " + accountID + " to your home page! What would you like to do?");
+        System.out.println("Welcome " + accountId + " to your home page! What would you like to do?");
 
         /*
             design choice between switch cases and if statements:
@@ -158,7 +160,7 @@ public class API {
                     break;
                 case "v":
                     // same thing here
-                    transactionHistory(accountID, pin);
+                    transactionHistory(accountId, pin);
                     break;
                 case "q":
                     // same thing here
@@ -177,7 +179,7 @@ public class API {
     private void viewBalance() {
         System.out.println(clearScreen);
         try {
-            System.out.println("Your current balance is: $" + Business.viewBalance(this.accountID));
+            System.out.println("Your current balance is: " + Business.viewBalance(this.accountId));
         } catch (BankException e) {
             System.out.println(e.getMessage());
         }
@@ -196,7 +198,7 @@ public class API {
             String input = s.nextLine();
             try {
                 BigDecimal amount = new BigDecimal(input.trim());
-                if (Business.validDeposit(accountID, amount)) {
+                if (Business.validDeposit(accountId, amount)) {
                     System.out.print("You've deposited $" + amount + ". Thank you!\nRedirecting to home screen...\n");
 
                     // Wait 3 seconds to clear the terminal and redirect to home screen
@@ -241,11 +243,11 @@ public class API {
                 BigDecimal amount = new BigDecimal(input.trim());
                 try{
                     //Business Layer - Call a  func to validate withdraw amount
-                    Business.validWithdraw(accountID, amount);
+                    Business.validWithdraw(accountId, amount);
                     System.out.println(clearScreen);
                     System.out.println("$"+ amount + " has been successfully withdrawn from your account.");
                 }
-                catch (BankException e){
+                catch (RuntimeException | BankException e){
                     System.out.println(clearScreen);
                     System.out.println("Withdrawal failed due to: " + e);
                 }
@@ -266,20 +268,25 @@ public class API {
     // Ye
     private void transfer() {
         System.out.println("Please input the account ID you'd like to transfer to.");
-        String toId = s.nextLine();
+        String toID = s.nextLine();
         System.out.println("Please input transfer amount.");
-        BigDecimal amount = new BigDecimal(s.nextLine().trim());
-        // Business Layer validates transaction
-        // Business.transfer(fromId, toId, amount)
-        System.out.println("You've transferred $" + amount + " to " + toId + ".");
+        try {
+            BigDecimal amount = new BigDecimal(s.nextLine().trim());
+            Business.validTransfer(accountID, toID, amount);
+            System.out.println("You've transferred $" + amount + " to " + toID + ".");
+        } catch (NumberFormatException e) {
+            System.out.println("Please enter a valid numeric value.");
+        } catch (BankException e) {
+            System.out.println("Transfer failed: " + e.getMessage());
+        }
     }
 
     //yousef
     // displays transaction activity from db
-    private void transactionHistory(String accountID, String pin) {
+    private void transactionHistory(String accountId, String pin) {
         final int pageSize = 5;
         try {
-            ArrayList<Transaction> res = Business.validateTransactionHistory(accountID, pin);
+            ArrayList<Transaction> res = Business.validateTransactionHistory(accountId, pin);
             if (res.isEmpty()) {
                 System.out.println("History is empty");
                 return;
