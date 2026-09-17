@@ -22,8 +22,7 @@ public class RepositoryTest {
     }
 
     @BeforeEach
-    void resetDatabase() throws Exception {
-        TestDatabaseHelper.clearDatabase();
+    void populateDatabase() throws Exception {
         TestDatabaseHelper.populateDatabase();
     }
 
@@ -32,5 +31,10 @@ public class RepositoryTest {
         BigDecimal balance = Repository.getBalance("Billy");
 
         assertEquals(0, balance.compareTo(new BigDecimal("1.00")));
+    }
+
+    @AfterEach
+    void clearDatabase() throws Exception {
+        TestDatabaseHelper.clearDatabase();
     }
 }
