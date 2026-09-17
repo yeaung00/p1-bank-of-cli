@@ -73,12 +73,15 @@ public class API {
         pin = s.nextLine();
         //Sends it  Business layer to verify credentials
         try {
+            logger.info("Sending to Business layer to verifyCredentials..");
             if(Business.verifyRegistration(accountId,pin)){
+                logger.info("An account was created for {}",accountId);
                 System.out.println(accountId +"'s Account created Successfully!");
             }else{
                 System.out.println("This account is taken.");
             }
         } catch (InvalidCredentialsException e){
+            logger.info("An account failed to be created for {}.",accountId,e);
             System.out.println("The Database communication failed");
         }
     }
@@ -105,12 +108,8 @@ public class API {
     // I can catch now a general bank exception without needing to know 
     // exactly which one the business layer will throw
         } catch (BankException e) {
-            // instead of printing to console, e will contain very sensitive information/ internal details
-            // so we must instead log this information into the logger
-            e.printStackTrace();
-            // two outcomes: either db failed to process request
-            // or Credentials given did not match any records in the db
-            // use .getMessage() to print the exception string
+            // we only print general information on the error, not intrinsic details
+            System.out.println(e.getMessage());
             return false;
         }
     }
@@ -208,6 +207,7 @@ public class API {
                     } catch (InterruptedException e) {
                         Thread.currentThread().interrupt();
                     }
+                    logger.info("Deposit SUCCESS: User " + accountId + " deposited $" + amount.toString() + ".");
                     break;
                 }
                 // Would need to move this somewhere later
@@ -217,6 +217,7 @@ public class API {
                     System.out.print(clearScreen);
                     break;
                 } else {
+                    logger.error("Deposit screen ERROR: User " + accountId + " inputted deposit amount in wrong format.");
                     System.out.println("Invalid input. Please try again.");
                 }
             } catch (BusinessException e) {
@@ -240,12 +241,15 @@ public class API {
             try{
                 BigDecimal amount = new BigDecimal(input.trim());
                 try{
+                    logger.info("Sending to the Business layer to validate the withdraw...");
                     //Business Layer - Call a  func to validate withdraw amount
                     Business.validWithdraw(accountId, amount);
+                    logger.info("Successfully withdrew {} from {}",amount,accountId);
                     System.out.println(clearScreen);
                     System.out.println("$"+ amount + " has been successfully withdrawn from your account.");
                 }
                 catch (RuntimeException | BankException e){
+                    logger.info("Failed to withdraw {} from {}", amount,accountId);
                     System.out.println(clearScreen);
                     System.out.println("Withdrawal failed due to: " + e);
                 }
