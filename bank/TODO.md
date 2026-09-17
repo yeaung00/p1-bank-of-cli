@@ -3,3 +3,4 @@
 
 ##Ydur
 -Implement safety checks to Transaction.java methods 
+-Verify pin later
