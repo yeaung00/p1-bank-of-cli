@@ -177,21 +177,26 @@ public class Repository {
                 debitStatement.setString(2, accountFrom);
                 debitStatement.setInt(3, cents);
                 if (debitStatement.executeUpdate() != 1) {
+                    logger.debug("Debit failed for {}: account missing or balance below {} cents.", accountFrom, cents);
                     throw new TransactionFailedException("Transfer failed. Missing account or balance too low.");
                 }
                 creditStatement.setInt(1, cents);
                 creditStatement.setString(2, accountTo);
                 if (creditStatement.executeUpdate() != 1) {
+                    logger.debug("Credit failed: recipient {} not found.", accountTo);
                     throw new AccountNotFoundException("Transfer failed: recipient " + accountTo + " not found.");
                 }
                 addTransaction(connection, accountFrom, "TRANSFER_OUT", cents, accountTo);
                 addTransaction(connection, accountTo, "TRANSFER_IN", cents, accountFrom);
                 connection.commit();
+                logger.info("Transfer committed: {} cents from {} to {}.", cents, accountFrom, accountTo);
             } catch (RepositoryException | SQLException e) {
                 connection.rollback();
+                logger.warn("Transfer rolled back for {} to {}: {}", accountFrom, accountTo, e.getMessage());
                 throw e;
             }
         } catch (SQLException e) {
+            logger.error("Database error during transfer", e);
             throw new DatabaseException("Database error during transfer", e);
         }
     }
