@@ -5,6 +5,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.PreparedStatement;
+import java.sql.*;
 
 import com.revature.exceptions.RepositoryException;
 import com.revature.exceptions.*;
@@ -21,8 +22,41 @@ public class Repository {
     private static final Logger logger = LoggerFactory.getLogger(Repository.class);
 
     // Adds a new account after a user registers - Ydur
-    public static void addAccount() {
+    public static void addAccount(String accountId,String pin) throws DatabaseException{
+        //Creating Query
+        String query = "insert into accounts (account_id, pin_hash, balance_cents) " +
+                "values(?, ?, ?)";
+        try(
+                //Creating connection using connection factory with autocommit method
+                Connection connection = ConnectionFactory.getAutoCommitConnect();
+                //Plug the query into the connection's prepared statement method & fill in placeholders(Also keeping connection adn stmnt in try-with-resources)
+                PreparedStatement statement = connection.prepareStatement(query)){
+            statement.setString(1,accountId);
+            statement.setString(2,pin);
+            statement.setString(3,"0");
 
+            //execute query
+            statement.executeUpdate();
+        }
+        catch (SQLException e){
+            throw new DatabaseException("Unable to communicate with the database to verify registration",e);
+        }
+    }
+    //Check to see if an account with the given id exists within the DB by querying a record of it and returning true if one is found
+    public static boolean checkExistingAccounts(String accountId) throws DatabaseException{
+        String query = "SELECT account_id FROM accounts WHERE account_id = ?";
+        //With this connection open using the try-with-resources to close resources within [try(...)],
+        try(Connection connection = ConnectionFactory.getAutoCommitConnect()){
+            //On this connection we would like to load a prepared statement with a query, then execute it
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.setString(1, accountId);
+            ResultSet res = statement.executeQuery();
+
+            return res.next();
+        }
+        catch (SQLException e){
+            throw new DatabaseException("Database error during Account retrieval: ",e);
+        }
     }
 
     // Gets the accountID and PIN to verify the credentials when logging in - Yousef
@@ -84,7 +118,7 @@ public class Repository {
     }
 
     // Might not even need this - Yousef
-    public static BigDecimal getBalance(String accountID) throws AccountNotFoundException, DatabaseException {
+    public static BigDecimal getBalance(String accountId) throws AccountNotFoundException, DatabaseException {
         // assuming that accountID is unique
         String query = "SELECT balance_cents FROM accounts WHERE account_id = ?";
 
@@ -92,7 +126,7 @@ public class Repository {
                 Connection conn = ConnectionFactory.getAutoCommitConnect();
                 PreparedStatement ps = conn.prepareStatement(query)
         ) {
-            ps.setString(1, accountID);
+            ps.setString(1, accountId);
 
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
@@ -102,7 +136,7 @@ public class Repository {
                 // TODO: similarly to what Yousef specified: this is where the logging would be
 
                 // assuming the AccountNotFoundException is implemented
-                throw new AccountNotFoundException("Account not found: " + accountID);
+                throw new AccountNotFoundException("Account not found: " + accountId);
             }
         } catch (SQLException e) {
             // assuming the DatabaseException is implemented
@@ -111,15 +145,16 @@ public class Repository {
     }
 
     // (updateBalance) Updates the value of balance during deposits and withdraws - Connor
-    public static int updateBalance(String accountID, BigDecimal amount) throws RepositoryException {
+    public static int updateBalance(String accountId, BigDecimal amount) throws RepositoryException {
         String query = "UPDATE accounts SET balance_cents = ? WHERE account_id = ?";
         try (
             Connection connection = ConnectionFactory.getAutoCommitConnect();
             PreparedStatement ps = connection.prepareStatement(query)
         ) {
             int cents = MoneyUtils.dollarsToCents(amount);
+
             ps.setInt(1, cents);
-            ps.setString(2, accountID);
+            ps.setString(2, accountId);
             int rowsAffected = ps.executeUpdate();
             if (rowsAffected != 1) {
                 throw new TransactionFailedException("Could not carry out transaction. Please try again.");
@@ -145,7 +180,7 @@ public class Repository {
         //TODO: I will need to go back and then order by creationDate asc in order to get the transaction history in order
         String query = "SELECT * FROM transactions t WHERE t.account_id = ?";
         ArrayList<Transaction> out = new ArrayList<>();
-        try(   
+        try(
             Connection connection = ConnectionFactory.getAutoCommitConnect();
             PreparedStatement statement = connection.prepareStatement(query);
         ) {
