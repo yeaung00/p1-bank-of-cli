@@ -139,8 +139,10 @@ public class Business {
         } else if (accountIDFrom.equals(accountIDTo)) {
             throw new InvalidCredentialsException("You cannot transfer to your own account");
         } else if (amount.compareTo(viewBalance(accountIDFrom)) > 0) {
+            logger.warn("Transfer rejected: {} has insufficient funds for {}", accountIDFrom, amount);
             throw new InsufficientFundsException("The transfer amount cannot be more than your balance.");
         }
+        logger.info("Transfer validated: {} -> {} amount {}", accountIDFrom, accountIDTo, amount);
         Repository.transfer(accountIDFrom, accountIDTo, amount);
         return true;
     }
