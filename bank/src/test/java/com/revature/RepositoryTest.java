@@ -57,5 +57,25 @@ public class RepositoryTest {
             connectionFactory.when(ConnectionFactory::getAutoCommitConnect).thenReturn(connection);
             assertThrows(EmptyTransactionHistoryException.class, () -> Repository.getTransactionHistory("missing-account"));
         }
+    @BeforeAll
+    static void setupDatabase() throws Exception {
+        TestDatabaseHelper.setupDatabase();
+    }
+
+    @BeforeEach
+    void populateDatabase() throws Exception {
+        TestDatabaseHelper.populateDatabase();
+    }
+
+    @Test
+    void testGetBalance() throws AccountNotFoundException, DatabaseException {
+        BigDecimal balance = Repository.getBalance("Billy");
+
+        assertEquals(0, balance.compareTo(new BigDecimal("1.00")));
+    }
+
+    @AfterEach
+    void clearDatabase() throws Exception {
+        TestDatabaseHelper.clearDatabase();
     }
 }
