@@ -155,13 +155,14 @@ public class Repository {
     }
 
     // (updateBalance) Updates the value of balance during deposits and withdraws - Connor
-    public static int updateBalance(String accountId, BigDecimal amount) throws RepositoryException {
+    public static int updateBalance(String accountId, BigDecimal amount, String action, BigDecimal amountChangedBy) throws RepositoryException {
         String query = "UPDATE accounts SET balance_cents = ? WHERE account_id = ?";
         try (
             Connection connection = ConnectionFactory.getAutoCommitConnect();
             PreparedStatement ps = connection.prepareStatement(query)
         ) {
             int cents = MoneyUtils.dollarsToCents(amount);
+            int centsAmountChangedBy = MoneyUtils.dollarsToCents(amountChangedBy);
 
             ps.setInt(1, cents);
             ps.setString(2, accountId);
@@ -170,6 +171,7 @@ public class Repository {
                 logger.error("updateBalance ERROR: User " + accountId + " failed to deposit " + amount.toString() + ".");
                 throw new TransactionFailedException("Could not carry out transaction. Please try again.");
             }
+            addTransaction(connection, accountId, action, centsAmountChangedBy, accountId);
             return rowsAffected;
         } catch (SQLException e) {
             logger.error("updateBalance ERROR: User " + accountId + " failed to deposit " + amount.toString() + ".");
