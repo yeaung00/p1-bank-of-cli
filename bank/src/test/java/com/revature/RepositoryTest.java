@@ -38,32 +38,72 @@ public class RepositoryTest {
         TestDatabaseHelper.clearDatabase();
     }
 
-    @Test
-    void addAccountPos() throws AccountNotFoundException, DatabaseException {
-        BigDecimal balance = Repository.getBalance("Billy");
 
-        assertEquals(0, balance.compareTo(new BigDecimal("1.00")));
+    //-----------------------------Ydur tests-----------------
+    @Test
+    void addAccountPos() throws Exception {
+        Connection connection = Mockito.mock(Connection.class);
+        PreparedStatement statement = Mockito.mock(PreparedStatement.class);
+
+        try (MockedStatic<ConnectionFactory> mockConnectionFactory = Mockito.mockStatic(ConnectionFactory.class)) {
+            mockConnectionFactory.when(() -> ConnectionFactory.getAutoCommitConnect()).thenReturn(connection);
+            Mockito.when(connection.prepareStatement(Mockito.anyString())).thenReturn(statement);
+
+            Repository.addAccount("Billy", "1234");
+
+            Mockito.verify(statement).setString(1, "Billy");
+            Mockito.verify(statement).setString(2, "1234");
+            Mockito.verify(statement).setString(3, "0");
+            Mockito.verify(statement).executeUpdate();
+        }
     }
 
     @Test
-    void addAccountNeg() throws AccountNotFoundException, DatabaseException {
-        BigDecimal balance = Repository.getBalance("Billy");
+    void addAccountNeg() throws Exception {
+        Connection connection = Mockito.mock(Connection.class);
 
-        assertEquals(0, balance.compareTo(new BigDecimal("1.00")));
-    }
+        try (MockedStatic<ConnectionFactory> mockConnectionFactory = Mockito.mockStatic(ConnectionFactory.class)) {
+            mockConnectionFactory.when(() -> ConnectionFactory.getAutoCommitConnect()).thenReturn(connection);
+            Mockito.when(connection.prepareStatement(Mockito.anyString())).thenThrow(new SQLException());
 
-
-    @Test
-    void checkExistingAccountPos() throws AccountNotFoundException, DatabaseException {
-        BigDecimal balance = Repository.getBalance("Billy");
-
-        assertEquals(0, balance.compareTo(new BigDecimal("1.00")));
+            assertThrows(DatabaseException.class, () -> Repository.addAccount("Billy", "1234")
+            );
+        }
     }
 
     @Test
-    void checkExistingAccountNeg() throws AccountNotFoundException, DatabaseException {
-        BigDecimal balance = Repository.getBalance("Billy");
+    void checkExistingAccountPos() throws Exception {
+        Connection connection = Mockito.mock(Connection.class);
+        PreparedStatement statement = Mockito.mock(PreparedStatement.class);
+        ResultSet result = Mockito.mock(ResultSet.class);
 
-        assertEquals(0, balance.compareTo(new BigDecimal("1.00")));
+        try (MockedStatic<ConnectionFactory> mockConnectionFactory = Mockito.mockStatic(ConnectionFactory.class)) {
+            mockConnectionFactory.when(() -> ConnectionFactory.getAutoCommitConnect()).thenReturn(connection);
+            Mockito.when(connection.prepareStatement(Mockito.anyString())).thenReturn(statement);
+            Mockito.when(statement.executeQuery()).thenReturn(result);
+            Mockito.when(result.next()).thenReturn(true);
+
+            boolean exists = Repository.checkExistingAccounts("Billy");
+
+            assertTrue(exists);
+        }
+    }
+
+    @Test
+    void checkExistingAccountNeg() throws Exception {
+        Connection connection = Mockito.mock(Connection.class);
+        PreparedStatement statement = Mockito.mock(PreparedStatement.class);
+        ResultSet result = Mockito.mock(ResultSet.class);
+
+        try (MockedStatic<ConnectionFactory> mockConnectionFactory = Mockito.mockStatic(ConnectionFactory.class)) {
+            mockConnectionFactory.when(() -> ConnectionFactory.getAutoCommitConnect()).thenReturn(connection);
+            Mockito.when(connection.prepareStatement(Mockito.anyString())).thenReturn(statement);
+            Mockito.when(statement.executeQuery()).thenReturn(result);
+            Mockito.when(result.next()).thenReturn(false);
+
+            boolean exists = Repository.checkExistingAccounts("Billy");
+
+            assertFalse(exists);
+        }
     }
 }
