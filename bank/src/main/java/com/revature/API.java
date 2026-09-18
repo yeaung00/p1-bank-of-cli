@@ -172,14 +172,14 @@ public class API {
         }
     }
 
-    // First come first serve for these 5
-
     // viewBalance: Displays the current balance of the account
     private void viewBalance() {
         System.out.println(clearScreen);
         try {
+            logger.info("Fetching balance for account ID: {}", this.accountId);
             System.out.println("Your current balance is: " + Business.viewBalance(this.accountId));
         } catch (BankException e) {
+            logger.info("An account failed to be created for {}.",accountId,e);
             System.out.println(e.getMessage());
         }
     }
