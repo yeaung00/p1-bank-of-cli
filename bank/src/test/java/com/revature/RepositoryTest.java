@@ -17,55 +17,6 @@ import com.revature.utility.MoneyUtils;
 
 public class RepositoryTest {
 
-    @BeforeEach
-    void createDummyInstance() throws SQLException {
-        String sqlQuery = "insert into accounts (account_id, pin_hash, balance_cents) values (?, ?, ?)";
-        try (
-            Connection connection = ConnectionFactory.getAutoCommitConnect();
-            PreparedStatement ps = connection.prepareStatement(sqlQuery);
-        ) {
-            ps.setString(1, "TestUser");
-            ps.setString(2, "Test");
-            ps.setInt(3, 10145);
-            int rowsAffected = ps.executeUpdate();
-            if (rowsAffected != 1) {
-                throw new SQLException();
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-    @Test
-    void testValidUpdateBalance() throws RepositoryException {
-        int result = Repository.updateBalance("TestUser", new BigDecimal("102.45"));
-        BigDecimal balance = Repository.getBalance("TestUser");
-        Assertions.assertEquals(new BigDecimal("102.45"), balance);
-        Assertions.assertEquals(1, result);
-    }
-
-    @Test 
-    void testInvalidUpdateBalance() throws RepositoryException {
-        Assertions.assertThrows(RepositoryException.class, () -> {Repository.updateBalance("UserDoesntExist", new BigDecimal("102.45"));});
-    }
-
-    @AfterEach 
-    void clearDummyInstance() {
-        String sqlQuery = "delete from accounts where account_id = ?";
-        try (
-            Connection connection = ConnectionFactory.getAutoCommitConnect();
-            PreparedStatement ps = connection.prepareStatement(sqlQuery);
-        ) {
-            ps.setString(1, "TestUser");
-            int rowsAffected = ps.executeUpdate();
-            if (rowsAffected != 1) {
-                throw new SQLException();
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-    
     @BeforeAll
     static void setupDatabase() throws Exception {
         TestDatabaseHelper.setupDatabase();
@@ -81,6 +32,19 @@ public class RepositoryTest {
         BigDecimal balance = Repository.getBalance("Billy");
 
         assertEquals(0, balance.compareTo(new BigDecimal("1.00")));
+    }
+
+    @Test
+    void testValidUpdateBalance() throws RepositoryException {
+        int result = Repository.updateBalance("Billy", new BigDecimal("102.45"));
+        BigDecimal balance = Repository.getBalance("Billy");
+        Assertions.assertEquals(1, result);
+        Assertions.assertEquals(new BigDecimal("102.45"), balance);
+    }
+
+    @Test 
+    void testInvalidUpdateBalance() throws RepositoryException {
+        Assertions.assertThrows(RepositoryException.class, () -> {Repository.updateBalance("UserDoesntExist", new BigDecimal("102.45"));});
     }
 
     @AfterEach
