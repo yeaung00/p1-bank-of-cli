@@ -129,7 +129,6 @@ public class Repository {
 
     // Might not even need this - Yousef
     public static BigDecimal getBalance(String accountId) throws AccountNotFoundException, DatabaseException {
-        // assuming that accountID is unique
         String query = "SELECT balance_cents FROM accounts WHERE account_id = ?";
 
         try (
@@ -140,16 +139,14 @@ public class Repository {
 
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
-                // process the result
+                logger.info("Balance found for account ID: {}", accountId);
                 return MoneyUtils.centsToDollars(rs.getInt("balance_cents"));
             } else {
-                // TODO: similarly to what Yousef specified: this is where the logging would be
-
-                // assuming the AccountNotFoundException is implemented
+                logger.error("Account not found with AccountID {}", accountId);
                 throw new AccountNotFoundException("Account not found: " + accountId);
             }
         } catch (SQLException e) {
-            // assuming the DatabaseException is implemented
+            logger.error(e.getMessage());
             throw new DatabaseException("Error occurred while fetching account balance", e);
         }
     }
