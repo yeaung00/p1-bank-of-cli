@@ -98,7 +98,7 @@ public class Business {
 
         // Send a request to the repo layer to update the balance to total
         BigDecimal total = viewBalance(accountId).add(amount);
-        Repository.updateBalance(accountId, total);
+        Repository.updateBalance(accountId, total, "DEPOSIT", amount);
 
         // Return true if everything above succeeds
         return true;
@@ -134,7 +134,7 @@ public class Business {
         try {
             BigDecimal total = viewBalance(accountId).subtract(amount);
             logger.info("Sending to Repository layer to update balance");
-            Repository.updateBalance(accountId,total);
+            Repository.updateBalance(accountId, total, "WITHDRAWAL", amount);
         } catch (InvalidCredentialsException | RepositoryException e) {
             throw new RuntimeException(e);
         }
