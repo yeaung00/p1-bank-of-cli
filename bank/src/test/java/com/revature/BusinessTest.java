@@ -110,4 +110,80 @@ public class BusinessTest {
                 () -> Business.viewBalance("Non-existing")
         );
     }
+
+//============================================Ydur's Tests===================
+
+    @Test
+    void verifyRegistrationPos() throws InvalidCredentialsException {
+        String accountId = "Billy";
+        String pin = "1234";
+
+        try (MockedStatic<Repository> mockRepository = Mockito.mockStatic(Repository.class)) {
+            mockRepository.when(() -> Repository.checkExistingAccounts(accountId)).thenReturn(false);
+
+            boolean result = Business.verifyRegistration(accountId, pin);
+
+            assertTrue(result);
+
+            mockRepository.verify(() -> Repository.checkExistingAccounts(accountId));
+            mockRepository.verify(() -> Repository.addAccount(accountId, pin));
+        }
+    }
+
+    @Test
+    void verifyRegistrationNeg() throws InvalidCredentialsException {
+        String accountId = "Billy";
+        String pin = "1234";
+
+        try (MockedStatic<Repository> mockRepository = Mockito.mockStatic(Repository.class)) {
+            mockRepository.when(() -> Repository.checkExistingAccounts(accountId)).thenReturn(true);
+
+            boolean result = Business.verifyRegistration(accountId, pin);
+
+            assertFalse(result);
+
+            mockRepository.verify(() -> Repository.checkExistingAccounts(accountId));
+            mockRepository.verify(() -> Repository.addAccount(accountId, pin), Mockito.never());
+        }
+    }
+
+    @Test
+    void validWithdrawPos() throws Exception {
+        String accountId = "Billy";
+        BigDecimal balance = new BigDecimal("100.00");
+        BigDecimal amount = new BigDecimal("25.00");
+
+        try (MockedStatic<Repository> mockRepository = Mockito.mockStatic(Repository.class)) {
+            mockRepository.when(() -> Repository.getBalance(accountId)).thenReturn(balance);
+            mockRepository.when(() -> Repository.updateBalance(accountId, new BigDecimal("75.00"))).thenReturn(1);
+
+            boolean result = Business.validWithdraw(accountId, amount);
+
+            assertTrue(result);
+
+            mockRepository.verify(() -> Repository.getBalance(accountId), Mockito.times(2));
+            mockRepository.verify(() -> Repository.updateBalance(accountId, new BigDecimal("75.00")));
+        }
+    }
+
+    @Test
+    void validWithdrawNeg() throws Exception {
+        String accountId = "Billy";
+        BigDecimal balance = new BigDecimal("100.00");
+        BigDecimal amount = new BigDecimal("150.00");
+
+        try (MockedStatic<Repository> mockRepository = Mockito.mockStatic(Repository.class)) {
+            mockRepository.when(() -> Repository.getBalance(accountId)).thenReturn(balance);
+
+            assertThrows(
+                    InsufficientFundsException.class,
+                    () -> Business.validWithdraw(accountId, amount)
+            );
+
+            mockRepository.verify(() -> Repository.getBalance(accountId));
+            mockRepository.verify(() -> Repository.updateBalance(Mockito.anyString(), Mockito.any(BigDecimal.class)),
+                    Mockito.never()
+            );
+        }
+    }
 }
