@@ -170,4 +170,62 @@ public class RepositoryTest {
             assertFalse(exists);
         }
     }
+
+    @Test
+    @DisplayName("transfer debits the sender and credits the recipient")
+    void testValidTransfer() throws RepositoryException {
+        Repository.transfer("Billy", "Sally", new BigDecimal("0.25"));
+        assertEquals(0, Repository.getBalance("Billy").compareTo(new BigDecimal("0.75")));
+        assertEquals(0, Repository.getBalance("Sally").compareTo(new BigDecimal("0.75")));
+    }
+
+    @Test
+    @DisplayName("transfer writes a TRANSFER_OUT and TRANSFER_IN record")
+    void testTransferWritesTransactionHistory() throws Exception {
+        Repository.transfer("Billy", "Sally", new BigDecimal("0.25"));
+
+        ArrayList<Transaction> billyHistory = Repository.getTransactionHistory("Billy");
+        Transaction billyTransfer = billyHistory.get(billyHistory.size() - 1);
+        assertEquals("TRANSFER_OUT", billyTransfer.getType());
+        assertEquals(0, billyTransfer.getAmount().compareTo(new BigDecimal("0.25")));
+        assertEquals("Sally", billyTransfer.getRelatedAccountId());
+
+        ArrayList<Transaction> sallyHistory = Repository.getTransactionHistory("Sally");
+        Transaction sallyTransfer = sallyHistory.get(sallyHistory.size() - 1);
+        assertEquals("TRANSFER_IN", sallyTransfer.getType());
+        assertEquals(0, sallyTransfer.getAmount().compareTo(new BigDecimal("0.25")));
+        assertEquals("Billy", sallyTransfer.getRelatedAccountId());
+    }
+
+    @Test
+    @DisplayName("transfer throws and changes nothing when the sender lacks funds")
+    void testTransferInsufficientFunds() throws RepositoryException {
+        assertThrows(
+                TransactionFailedException.class,
+                () -> Repository.transfer("Billy", "Sally", new BigDecimal("5.00"))
+        );
+
+        assertEquals(0, Repository.getBalance("Billy").compareTo(new BigDecimal("1.00")));
+        assertEquals(0, Repository.getBalance("Sally").compareTo(new BigDecimal("0.50")));
+    }
+
+    @Test
+    @DisplayName("transfer rolls back the debit when the recipient does not exist")
+    void testTransferRollsBackForMissingRecipient() throws RepositoryException {
+        assertThrows(
+                AccountNotFoundException.class,
+                () -> Repository.transfer("Billy", "NonExistent", new BigDecimal("0.25"))
+        );
+
+        assertEquals(0, Repository.getBalance("Billy").compareTo(new BigDecimal("1.00")));
+    }
+
+    @Test
+    @DisplayName("transfer throws when the sender does not exist")
+    void testTransferMissingSender() {
+        assertThrows(
+                TransactionFailedException.class,
+                () -> Repository.transfer("NonExistent", "Sally", new BigDecimal("0.25"))
+        );
+    }
 }
