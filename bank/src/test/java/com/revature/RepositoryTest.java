@@ -64,5 +64,25 @@ public class RepositoryTest {
             Mockito.verify(accountQuery).setString(1, "missing-account");
             Mockito.verify(accountQuery).setString(2, "9999");
         }
+    @BeforeAll
+    static void setupDatabase() throws Exception {
+        TestDatabaseHelper.setupDatabase();
+    }
+
+    @BeforeEach
+    void populateDatabase() throws Exception {
+        TestDatabaseHelper.populateDatabase();
+    }
+
+    @Test
+    void testGetBalance() throws AccountNotFoundException, DatabaseException {
+        BigDecimal balance = Repository.getBalance("Billy");
+
+        assertEquals(0, balance.compareTo(new BigDecimal("1.00")));
+    }
+
+    @AfterEach
+    void clearDatabase() throws Exception {
+        TestDatabaseHelper.clearDatabase();
     }
 }
