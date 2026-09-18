@@ -27,11 +27,19 @@ public class TestDatabaseHelper {
                 "(\"Slagathor\", \"time\", 3000)," +
                 "(\"Timmy\", \"hello\", 200);";
 
+        String transactionQuery = "INSERT INTO transactions " +
+                "(account_id, transaction_type, amount_cents, related_account_id) VALUES " +
+                "(\"Billy\", \"DEPOSIT\", 100, \"Billy\")," +
+                "(\"Sally\", \"DEPOSIT\", 50, \"Sally\")," +
+                "(\"Billy\", \"TRANSFER_OUT\", 25, \"Sally\")," +
+                "(\"Sally\", \"TRANSFER_IN\", 25, \"Billy\");";
+
         try (
                 Connection conn = ConnectionFactory.getAutoCommitConnect();
                 Statement stmt = conn.createStatement();
                 ) {
             stmt.executeUpdate(query);
+            stmt.executeUpdate(transactionQuery);
         } catch (SQLException e) {
             throw new DatabaseException("Failed to populate tables", e);
         }

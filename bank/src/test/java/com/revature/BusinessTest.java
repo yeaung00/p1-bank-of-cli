@@ -13,7 +13,30 @@ import com.revature.exceptions.*;
 import com.revature.exceptions.customexceptions.*;
 
 public class BusinessTest {
-    @Test 
+    @Test
+    void testValidDeposit() throws BusinessException, RepositoryException {
+        try (MockedStatic<Repository> mockRepo = Mockito.mockStatic(Repository.class);
+        ) {
+            mockRepo.when(() -> Repository.updateBalance("Billy", new BigDecimal("800"))).thenReturn(1);
+            mockRepo.when(() -> Repository.getBalance("Billy")).thenReturn(BigDecimal.ZERO);
+            boolean result = Business.validDeposit("Billy", new BigDecimal("800"));
+            Assertions.assertEquals(true, result);
+        }
+    }
+
+    // Tests that if a negative amount is entered, a BusinessException is thrown.
+    @Test
+    void testNegativeDeposit() throws BusinessException, RepositoryException {
+        Assertions.assertThrows(BusinessException.class, () -> {Business.validDeposit("Billy", new BigDecimal(-800));});
+    }
+
+    // Tests that if an amount with more than two decimal places is entered, a BusinessException is thrown.
+    @Test
+    void testMoreThanTwoDecimalPlacesDeposit() {
+        Assertions.assertThrows(BusinessException.class, () -> {Business.validDeposit("Billy", new BigDecimal(100.401));});
+    }
+
+    @Test
     @DisplayName ("validateTransactionHistory should return list of Transactions")
     void testSuccessfulValidateTransactionHistory() throws BankException{
         //ARRANGE: we set up the variables/objects needed in order to test the method
@@ -30,7 +53,7 @@ public class BusinessTest {
 
             // ACT: we call the method we are testing
             ArrayList<Transaction> result = Business.validateTransactionHistory(accountId, pin);
-            //ASSERT: we check whether the result is how we intend it to be 
+            //ASSERT: we check whether the result is how we intend it to be
             assertEquals(out,result);
             mockRepo.verify(() -> Repository.getAccount(accountId, pin));
             mockRepo.verify(() -> Repository.getTransactionHistory(accountId));
@@ -69,6 +92,7 @@ public class BusinessTest {
             mockRepository.verify(() -> Repository.getAccount(accountId, pin));
         }
     }
+
     @Test
     @DisplayName("verifyCredentials throws for invalid credentials")
     void testInvalidCredentials() {
@@ -81,6 +105,107 @@ public class BusinessTest {
                 // we can catch any business layer error
                 BusinessException.class,
                 () -> Business.verifyCredentials(accountId, pin)
+            );
+        }
+    }
+
+    @Test
+    @DisplayName("viewBalance returns true for an existing account")
+    void testViewBalance() throws BankException {
+        BigDecimal expectedBalance = new BigDecimal("1.00");
+
+        try (MockedStatic<Repository> repo = Mockito.mockStatic(Repository.class)) {
+            repo.when(() -> Repository.getBalance("Billy")).thenReturn(expectedBalance);
+        }
+
+        BigDecimal actualBalance = Business.viewBalance("Billy");
+        assertEquals(0, actualBalance.compareTo(expectedBalance));
+    }
+
+    @Test
+    @DisplayName("viewBalance returns false for a non-existing account")
+    void testInvalidViewBalance() throws BankException {
+        try (MockedStatic<Repository> repo = Mockito.mockStatic(Repository.class)) {
+            repo.when(() -> Repository.getBalance("Non-existing")).thenThrow(new AccountNotFoundException("Account not found"));
+        }
+        assertThrows(
+                BusinessException.class,
+                () -> Business.viewBalance("Non-existing")
+        );
+    }
+
+//============================================Ydur's Tests===================
+
+    @Test
+    void verifyRegistrationPos() throws InvalidCredentialsException {
+        String accountId = "Billy";
+        String pin = "1234";
+
+        try (MockedStatic<Repository> mockRepository = Mockito.mockStatic(Repository.class)) {
+            mockRepository.when(() -> Repository.checkExistingAccounts(accountId)).thenReturn(false);
+
+            boolean result = Business.verifyRegistration(accountId, pin);
+
+            assertTrue(result);
+
+            mockRepository.verify(() -> Repository.checkExistingAccounts(accountId));
+            mockRepository.verify(() -> Repository.addAccount(accountId, pin));
+        }
+    }
+
+    @Test
+    void verifyRegistrationNeg() throws InvalidCredentialsException {
+        String accountId = "Billy";
+        String pin = "1234";
+
+        try (MockedStatic<Repository> mockRepository = Mockito.mockStatic(Repository.class)) {
+            mockRepository.when(() -> Repository.checkExistingAccounts(accountId)).thenReturn(true);
+
+            boolean result = Business.verifyRegistration(accountId, pin);
+
+            assertFalse(result);
+
+            mockRepository.verify(() -> Repository.checkExistingAccounts(accountId));
+            mockRepository.verify(() -> Repository.addAccount(accountId, pin), Mockito.never());
+        }
+    }
+
+    @Test
+    void validWithdrawPos() throws Exception {
+        String accountId = "Billy";
+        BigDecimal balance = new BigDecimal("100.00");
+        BigDecimal amount = new BigDecimal("25.00");
+
+        try (MockedStatic<Repository> mockRepository = Mockito.mockStatic(Repository.class)) {
+            mockRepository.when(() -> Repository.getBalance(accountId)).thenReturn(balance);
+            mockRepository.when(() -> Repository.updateBalance(accountId, new BigDecimal("75.00"))).thenReturn(1);
+
+            boolean result = Business.validWithdraw(accountId, amount);
+
+            assertTrue(result);
+
+            mockRepository.verify(() -> Repository.getBalance(accountId), Mockito.times(2));
+            mockRepository.verify(() -> Repository.updateBalance(accountId, new BigDecimal("75.00")));
+        }
+    }
+
+    @Test
+    void validWithdrawNeg() throws Exception {
+        String accountId = "Billy";
+        BigDecimal balance = new BigDecimal("100.00");
+        BigDecimal amount = new BigDecimal("150.00");
+
+        try (MockedStatic<Repository> mockRepository = Mockito.mockStatic(Repository.class)) {
+            mockRepository.when(() -> Repository.getBalance(accountId)).thenReturn(balance);
+
+            assertThrows(
+                    InsufficientFundsException.class,
+                    () -> Business.validWithdraw(accountId, amount)
+            );
+
+            mockRepository.verify(() -> Repository.getBalance(accountId));
+            mockRepository.verify(() -> Repository.updateBalance(Mockito.anyString(), Mockito.any(BigDecimal.class)),
+                    Mockito.never()
             );
         }
     }

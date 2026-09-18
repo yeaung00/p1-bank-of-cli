@@ -9,6 +9,8 @@ import org.mockito.MockedStatic;
 import com.revature.exceptions.*;
 import com.revature.exceptions.customexceptions.*;
 import com.revature.utility.*;
+
+import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -24,9 +26,7 @@ public class APITest {
     private API theAPI;
 
     @BeforeEach 
-    void setup() {
-        theAPI = new API();
-    }
+    void setup() {theAPI = new API();}
 
     @Test 
     @DisplayName ("API object should not be null")
