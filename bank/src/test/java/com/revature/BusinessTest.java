@@ -207,4 +207,72 @@ public class BusinessTest {
             );
         }
     }
+
+    @Test
+    @DisplayName("validTransfer delegates to the repository when everything is valid")
+    void testValidTransfer() throws BusinessException, RepositoryException {
+        try (MockedStatic<Repository> mockRepo = Mockito.mockStatic(Repository.class)) {
+            mockRepo.when(() -> Repository.getBalance("Billy")).thenReturn(new BigDecimal("500.00"));
+            boolean result = Business.validTransfer("Billy", "Sally", new BigDecimal("10.50"));
+            assertTrue(result);
+            mockRepo.verify(() -> Repository.transfer("Billy", "Sally", new BigDecimal("10.50")));
+        }
+    }
+
+    @Test
+    @DisplayName("validTransfer throws InsufficientFundsException and moves no money")
+    void testTransferAboveBalance() {
+        try (MockedStatic<Repository> mockRepo = Mockito.mockStatic(Repository.class)) {
+            mockRepo.when(() -> Repository.getBalance("Billy")).thenReturn(new BigDecimal("50.00"));
+            assertThrows(
+                    InsufficientFundsException.class,
+                    () -> Business.validTransfer("Billy", "Sally", new BigDecimal("75.00"))
+            );
+            mockRepo.verify(
+                    () -> Repository.transfer(Mockito.any(), Mockito.any(), Mockito.any()),
+                    Mockito.never()
+            );
+        }
+    }
+
+    @Test
+    @DisplayName("validTransfer rejects zero")
+    void testZeroTransfer() {
+        assertThrows(
+                NegativeInputException.class,
+                () -> Business.validTransfer("Billy", "Sally", BigDecimal.ZERO)
+        );
+    }
+
+    @Test
+    @DisplayName("validTransfer rejects more than 2 decimal places")
+    void testMoreThanTwoDecimalPlacesTransfer() {
+        assertThrows(
+                MoreThanTwoDecimalPlacesException.class,
+                () -> Business.validTransfer("Billy", "Sally", new BigDecimal("10.001"))
+        );
+    }
+
+    @Test
+    @DisplayName("validTransfer rejects a transfer to own account")
+    void testSelfTransfer() {
+        assertThrows(
+                InvalidCredentialsException.class,
+                () -> Business.validTransfer("Billy", "Billy", new BigDecimal("10.00"))
+        );
+    }
+
+    @Test
+    @DisplayName("validTransfer passes a repository failure up to the caller")
+    void testTransferRepositoryFailure() {
+        try (MockedStatic<Repository> mockRepo = Mockito.mockStatic(Repository.class)) {
+            mockRepo.when(() -> Repository.getBalance("Billy")).thenReturn(new BigDecimal("500.00"));
+            mockRepo.when(() -> Repository.transfer("Billy", "Sally", new BigDecimal("10.50")))
+                    .thenThrow(new DatabaseException("Database error during transfer"));
+            assertThrows(
+                    DatabaseException.class,
+                    () -> Business.validTransfer("Billy", "Sally", new BigDecimal("10.50"))
+            );
+        }
+    }
 }
