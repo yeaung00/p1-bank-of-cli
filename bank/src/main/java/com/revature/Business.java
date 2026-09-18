@@ -68,16 +68,19 @@ public class Business {
         // viewBalance doesn't ever have to interact with an Account object:
         // only ever querying the database and returning that value
         try {
+            logger.info("Fetching balance for account ID: {}", accountID);
             return Repository.getBalance(accountID);
         } catch (RepositoryException e) {
             if (e instanceof AccountNotFoundException) {
+                logger.error("Account not found for ID: {}", accountID);
                 throw new InvalidCredentialsException("Invalid accountID", e);
             }
             if (e instanceof DatabaseException dbException) {
+                logger.error("Database error occurred while fetching balance for ID: {}", accountID, dbException);
                 throw dbException;
             }
 
-            // this return value can be changed for better logging/error purposes
+            logger.error("Unexpected error occurred", e);
             return BigDecimal.ZERO;
         }
     }
