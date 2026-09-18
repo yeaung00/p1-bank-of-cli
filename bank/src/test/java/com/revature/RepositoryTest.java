@@ -26,19 +26,15 @@ public class RepositoryTest {
         TestDatabaseHelper.populateDatabase();
     }
 
-    @AfterEach
-    void clearDatabase() throws Exception {
-        TestDatabaseHelper.clearDatabase();
-    }
-
     @Test
+    @DisplayName("getBalance returns true for an existing account")
     void testGetBalance() throws AccountNotFoundException, DatabaseException {
         BigDecimal balance = Repository.getBalance("Billy");
 
         assertEquals(0, balance.compareTo(new BigDecimal("1.00")));
     }
 
-    @Test 
+    @Test
     @DisplayName ("Should return a non-empty list of transactions")
     void testValidGetTransactionHistory() throws Exception {
         ArrayList<Transaction> transactions = Repository.getTransactionHistory("Billy");
@@ -53,16 +49,16 @@ public class RepositoryTest {
         assertEquals("Sally", transactions.get(1).getRelatedAccountId());
     }
 
-    @Test 
+    @Test
     @DisplayName ("Should throw EmptyTransactionHistoryException error")
     void testInvalidGetTransactionHistory() throws BankException {
         assertThrows(
                 EmptyTransactionHistoryException.class,
                 () -> Repository.getTransactionHistory("missing-account")
         );
-      
+
     }
-  
+
     @Test
     @DisplayName ("Tests whether you can retrieve a valid Account from the database")
     void testValidGetAccount() throws BusinessException, RepositoryException{
@@ -76,5 +72,19 @@ public class RepositoryTest {
     @DisplayName("Should throw AccountNotFoundException for invalid account credentials")
     void testInvalidGetAccount() {
         assertThrows(AccountNotFoundException.class, () -> Repository.getAccount("Billy", "9999"));
+    }
+
+    @Test
+    @DisplayName("getBalance returns false for a non-existing account")
+    void testGetBalanceNonExisting() {
+        assertThrows(
+                AccountNotFoundException.class,
+                () -> Repository.getBalance("NonExistent")
+        );
+    }
+
+    @AfterEach
+    void clearDatabase() throws Exception {
+        TestDatabaseHelper.clearDatabase();
     }
 }

@@ -13,7 +13,7 @@ import com.revature.exceptions.*;
 import com.revature.exceptions.customexceptions.*;
 
 public class BusinessTest {
-    @Test 
+    @Test
     @DisplayName ("validateTransactionHistory should return list of Transactions")
     void testSuccessfulValidateTransactionHistory() throws BankException{
         //ARRANGE: we set up the variables/objects needed in order to test the method
@@ -30,7 +30,7 @@ public class BusinessTest {
 
             // ACT: we call the method we are testing
             ArrayList<Transaction> result = Business.validateTransactionHistory(accountId, pin);
-            //ASSERT: we check whether the result is how we intend it to be 
+            //ASSERT: we check whether the result is how we intend it to be
             assertEquals(out,result);
             mockRepo.verify(() -> Repository.getAccount(accountId, pin));
             mockRepo.verify(() -> Repository.getTransactionHistory(accountId));
@@ -69,6 +69,7 @@ public class BusinessTest {
             mockRepository.verify(() -> Repository.getAccount(accountId, pin));
         }
     }
+
     @Test
     @DisplayName("verifyCredentials throws for invalid credentials")
     void testInvalidCredentials() {
@@ -83,5 +84,30 @@ public class BusinessTest {
                 () -> Business.verifyCredentials(accountId, pin)
             );
         }
+    }
+
+    @Test
+    @DisplayName("viewBalance returns true for an existing account")
+    void testViewBalance() throws BankException {
+        BigDecimal expectedBalance = new BigDecimal("1.00");
+
+        try (MockedStatic<Repository> repo = Mockito.mockStatic(Repository.class)) {
+            repo.when(() -> Repository.getBalance("Billy")).thenReturn(expectedBalance);
+        }
+
+        BigDecimal actualBalance = Business.viewBalance("Billy");
+        assertEquals(0, actualBalance.compareTo(expectedBalance));
+    }
+
+    @Test
+    @DisplayName("viewBalance returns false for a non-existing account")
+    void testInvalidViewBalance() throws BankException {
+        try (MockedStatic<Repository> repo = Mockito.mockStatic(Repository.class)) {
+            repo.when(() -> Repository.getBalance("Non-existing")).thenThrow(new AccountNotFoundException("Account not found"));
+        }
+        assertThrows(
+                BusinessException.class,
+                () -> Business.viewBalance("Non-existing")
+        );
     }
 }
