@@ -39,6 +39,31 @@ public class RepositoryTest {
     }
 
     @Test 
+    @DisplayName ("Should return a non-empty list of transactions")
+    void testValidGetTransactionHistory() throws Exception {
+        ArrayList<Transaction> transactions = Repository.getTransactionHistory("Billy");
+
+        assertEquals(2, transactions.size());
+        assertEquals("Billy", transactions.get(0).getAccountId());
+        assertEquals("DEPOSIT", transactions.get(0).getType());
+        assertEquals(new BigDecimal("1.00"), transactions.get(0).getAmount());
+        assertEquals("Billy", transactions.get(0).getRelatedAccountId());
+        assertEquals("TRANSFER_OUT", transactions.get(1).getType());
+        assertEquals(new BigDecimal("0.25"), transactions.get(1).getAmount());
+        assertEquals("Sally", transactions.get(1).getRelatedAccountId());
+    }
+
+    @Test 
+    @DisplayName ("Should throw EmptyTransactionHistoryException error")
+    void testInvalidGetTransactionHistory() throws BankException {
+        assertThrows(
+                EmptyTransactionHistoryException.class,
+                () -> Repository.getTransactionHistory("missing-account")
+        );
+      
+    }
+  
+    @Test
     @DisplayName ("Tests whether you can retrieve a valid Account from the database")
     void testValidGetAccount() throws BusinessException, RepositoryException{
         Account account = Repository.getAccount("Billy", "1");
