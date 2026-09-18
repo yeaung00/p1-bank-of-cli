@@ -85,7 +85,8 @@ public class RepositoryTest {
 
     @Test
     void testValidUpdateBalance() throws RepositoryException {
-        int result = Repository.updateBalance("Billy", new BigDecimal("102.45"));
+        BigDecimal amountChangedBy = new BigDecimal("102.45").subtract(Repository.getBalance("Billy"));
+        int result = Repository.updateBalance("Billy", new BigDecimal("102.45"), "DEPOSIT", amountChangedBy);
         BigDecimal balance = Repository.getBalance("Billy");
         Assertions.assertEquals(1, result);
         Assertions.assertEquals(new BigDecimal("102.45"), balance);
@@ -93,7 +94,7 @@ public class RepositoryTest {
 
     @Test
     void testInvalidUpdateBalance() throws RepositoryException {
-        Assertions.assertThrows(RepositoryException.class, () -> {Repository.updateBalance("UserDoesntExist", new BigDecimal("102.45"));});
+        Assertions.assertThrows(RepositoryException.class, () -> {Repository.updateBalance("UserDoesntExist", new BigDecimal("102.45"), "DEPOSIT", BigDecimal.ZERO);});
     }
 
     @AfterEach
