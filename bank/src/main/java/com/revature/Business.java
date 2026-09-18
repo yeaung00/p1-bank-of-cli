@@ -99,7 +99,6 @@ public class Business {
         // Send a request to the repo layer to update the balance to total
         BigDecimal total = viewBalance(accountId).add(amount);
         Repository.updateBalance(accountId, total);
-        System.out.println("This is where the Account object would update the balance");
 
         // Return true if everything above succeeds
         return true;
