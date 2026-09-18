@@ -176,14 +176,14 @@ public class BusinessTest {
 
         try (MockedStatic<Repository> mockRepository = Mockito.mockStatic(Repository.class)) {
             mockRepository.when(() -> Repository.getBalance(accountId)).thenReturn(balance);
-            mockRepository.when(() -> Repository.updateBalance(accountId, new BigDecimal("75.00"), "WITHDRAW", amount)).thenReturn(1);
+            mockRepository.when(() -> Repository.updateBalance(accountId, new BigDecimal("75.00"), "WITHDRAWAL", amount)).thenReturn(1);
 
             boolean result = Business.validWithdraw(accountId, amount);
 
             assertTrue(result);
 
             mockRepository.verify(() -> Repository.getBalance(accountId), Mockito.times(2));
-            // mockRepository.verify(() -> Repository.updateBalance(accountId, new BigDecimal("75.00"), "WITHDRAW"));
+            mockRepository.verify(() -> Repository.updateBalance(accountId, new BigDecimal("75.00"), "WITHDRAWAL", amount), Mockito.times(1));
         }
     }
 
@@ -202,11 +202,9 @@ public class BusinessTest {
             );
 
             mockRepository.verify(() -> Repository.getBalance(accountId));
-            /*
-            mockRepository.verify(() -> Repository.updateBalance(Mockito.anyString(), Mockito.any(BigDecimal.class), "N/A", Mockito.any(BigDecimal.class)),
-                    Mockito.never()
+            mockRepository.verify(() -> Repository.updateBalance(Mockito.anyString(), Mockito.any(BigDecimal.class), Mockito.anyString(), Mockito.any(BigDecimal.class)),
+                Mockito.never()
             );
-            */
         }
     }
 }
